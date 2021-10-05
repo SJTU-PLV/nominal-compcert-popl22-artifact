@@ -255,11 +255,11 @@ very big and listed as follows:
         step (Callstate (Internal f) vargs k m)
           E0 (State f f.(fn_body) k (Vptr sp Ptrofs.zero) e m')
     ...
-   ```
+    ```
 
-   to 
+    to 
 
-   ```
+    ```
     Inductive step: state -> trace -> state -> Prop :=
     ...
     | step_return_0: forall f k sp e m m' m'',
@@ -275,7 +275,7 @@ very big and listed as follows:
       step (Callstate (Internal f) vargs k m id)
         E0 (State f f.(fn_body) k (Vptr sp Ptrofs.zero) e m'')
     ...
-   ```
+    ```
 
   - (Line 717) In our artifact, `alloc` is updated to have the same
     implementation as `alloc_block`. Therefore, we have reused the
