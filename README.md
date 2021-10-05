@@ -287,19 +287,19 @@ very big and listed as follows:
 
 ### Intuitive proofs for partial memory transformation
 
- This corresponds to the discussion in Section 4.3. We have updated
- the proofs for `SimplLocals`, `Cminorgen`, `Unusedglob` and
- `Stacking` to use structural memory injections. They are formalized
- in `cfrontend/SimplLocalsproof.v`, `cfronend/Cminorgenproof.v`,
- `backend/Unusedglobproof.v` and `backend/Stackingproof.v`.
+  This corresponds to the discussion in Section 4.3. We have updated
+  the proofs for `SimplLocals`, `Cminorgen`, `Unusedglob` and
+  `Stacking` to use structural memory injections. They are formalized
+  in `cfrontend/SimplLocalsproof.v`, `cfronend/Cminorgenproof.v`,
+  `backend/Unusedglobproof.v` and `backend/Stackingproof.v`.
 
- - (Section 4.3.1) For each pass, its structural memory injection is
-   defined as the function `struct_meminj`. The implementation of
-   `struct_meminj` varies with different passes. For example,
-   `struct_meminj` for `Unusedglobal` (lines 764-769) is defined in
-   `backend/Unusedglobproof.v` as follows:
+  - (Section 4.3.1) For each pass, its structural memory injection is
+    defined as the function `struct_meminj`. The implementation of
+    `struct_meminj` varies with different passes. For example,
+    `struct_meminj` for `Unusedglobal` (lines 764-769) is defined in
+    `backend/Unusedglobproof.v` as follows:
    
-   ```
+    ```
     Definition check_block (s:sup): block -> bool :=
       fun b =>
         match b with
@@ -311,12 +311,12 @@ very big and listed as follows:
     
     Definition struct_meminj (s:sup) :=
       fun b => if check_block s b then Some (b,0) else None.
-  ```
+    ```
 
-  and `struct_meminj` for `Cminorgen` (lines 804-809) is defined in
-  `cfrontend/Cminorgenproof.v` as follows:
+    and `struct_meminj` for `Cminorgen` (lines 804-809) is defined in
+    `cfrontend/Cminorgenproof.v` as follows:
 
-  ```
+    ```
     Definition unchecked_meminj : meminj :=
       fun b => match b with
         |Stack (Some id) path pos =>
@@ -331,38 +331,37 @@ very big and listed as follows:
     Definition struct_meminj (s:sup) : meminj :=
       fun b => if Mem.sup_dec b s then
                unchecked_meminj b else None.
-  ```
+    ```
 
- - (Section 4.3.2 and 4.3.3.) With the structured memory injection, we
-   are able to simplify the reasoning about stack memory. For example,
-   in `Unusedglobalproof.v`, the invariant `match_states_regular` now
-   carries two new assumptions:
+  - (Section 4.3.2 and 4.3.3.) With the structured memory injection,
+    we are able to simplify the reasoning about stack memory. For
+    example, in `Unusedglobalproof.v`, the invariant
+    `match_states_regular` now carries two new assumptions:
 
-   ```
-     (SMJ: j = struct_meminj (Mem.support m))
-     (MSTK: Mem.stack(Mem.support m) = Mem.stack(Mem.support tm))
-   ```
+    ```
+    (SMJ: j = struct_meminj (Mem.support m))
+    (MSTK: Mem.stack(Mem.support m) = Mem.stack(Mem.support tm))
+    ```
 
-   Here, `SMJ` asserts that the injection is a structural one, while
-   `MSTK` asserts that the stack tree is exactly the same before and
-   after the transformation (as `Unusedglob` does not touch stack at
-   all). With this very precise invariant (thanks to the structural
-   injection), we know that at any point of regular execution, the
-   stack frames are not changed at all. As a result, the proof becomes
-   much more intuitive. 
+    Here, `SMJ` asserts that the injection is a structural one, while
+    `MSTK` asserts that the stack tree is exactly the same before and
+    after the transformation (as `Unusedglob` does not touch stack at
+    all). With this very precise invariant (thanks to the structural
+    injection), we know that at any point of regular execution, the
+    stack frames are not changed at all. As a result, the proof
+    becomes much more intuitive.
 
-   Similar observations can be made for other passes. For example, in
-   `SimplLocalsproof.v`, we have the following new invariants:
+    Similar observations can be made for other passes. For example, in
+    `SimplLocalsproof.v`, we have the following new invariants:
    
-   ```
+    ```
     (VINJ: j = struct_meminj (Mem.support m))
     (MSTK: Mem.stackseq m tm)
-   ```
+    ```
 
-   where `Mem.stackseq` holds if the stack trees have the same
-   structure. This help us convert reasoning about the whole stack
-   memory into that for individual stack frames.
-
+    where `Mem.stackseq` holds if the stack trees have the same
+    structure. This help us convert reasoning about the whole stack
+    memory into that for individual stack frames.
 
 ### Verified compilation of programs with contextual memory
 
@@ -374,5 +373,6 @@ very big and listed as follows:
 
 
 ## Extension 3: Stack-Aware Nominal CompCert
+
 
 ## Extension 4: Multi-Stack CompCert
