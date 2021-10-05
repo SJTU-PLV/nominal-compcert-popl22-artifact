@@ -11,7 +11,8 @@ based on a nominal memory model, as follows:
 4. Multi-Stack CompCert
 
 The complete source code of each exentsion can be found in a
-corresponding top-level directory. The artifact accompanies the
+corresponding top-level directory (we have included a copy of CompCert
+v3.8 for comparison and reference). The artifact accompanies the
 following paper:
 
   > *Verified Compilation of C Programs with a Nominal Memory Model*.
@@ -102,10 +103,82 @@ run the test cases in the `test` directory, as follows:
   make test
 ```
 
-## Nominal CompCert
+
+## Extension 1: Nominal CompCert
 
 In the remaining sections, we present the details of each extension
 and show their correspondence to the discussion in the paper. We first
-discuss Nominal CompCert.
+discuss the nominal memory model and Nominal CompCert, which are
+implemented in the directory `Nominal-CompCert` and correspond to the
+contents in Section 3 of the paper.
 
+### Nominal Memory Model
+
+The nominal memory model is introduced Section 3.2. Its constituents
+are listed as follows:
+
+- The interface for nominal block ids `BLOCK` is defined in `common/Values.v`.
+
+- The instantiation of `BLOCK` with postive ids is defined by the Coq
+  module `Block` in `common/Values.v`.
+
+- The interface for supports `SUP` is defined in `common/Memtype.v`.
+
+- The instantiation of supports as a list of block ids is defined by the module `Sup` in `common/Memory.v'.
+
+- The updated memory state `mem` is defined in `common/Memory.v` with
+  a new field `support:sup`.  The updated definition of `valid_block`
+  can also be found in this file. The basic properties of the memory
+  model have been reproved with these changes.
+
+### Nominal CompCert
+
+Nominal CompCert is introduced in Section 3.3. The corresponding
+changes w.r.t. CompCert are listed as follows:
+
+- One main difference is that operations over next
+  blocks are changed to those over supports. For instance, in
+  `cfrontend/Cminorgenproof.v` in CompCert v3.8, there was an old
+  lemma stating that next block is not changed by the operation
+  `free_list`:
+  ```
+  Lemma nextblock_freelist:
+    forall fbl m m',
+    Mem.free_list m fbl = Some m' ->
+    Mem.nextblock m' = Mem.nextblock m.
+  ```
+  It is generalized to the following theorem about support:
+  ```
+  Lemma support_freelist:
+    forall fbl m m',
+      Mem.free_list m fbl = Some m' ->
+      Mem.support m' = Mem.support m.
+  ```
+  There exists many other small changes with the same nature; we
+  elide a discussion of them.
+
+- The changes to valid blocks discussed at lines 526-532 is
+  demonstrated in `backend/Inliningproof.v`. Previously, the
+  invariant `match_stacks_cons` assumes:
+  ```
+    (BELOW: Plt sp' bound)
+  ```
+  which guarantees that `sp'` is a valid block.  In Nominal CompCert,
+  the next block `bound` is changed to `support` and the above
+  proposition is broken into two:
+  ```
+    (SPS': sp' = fresh_block sps')
+    ...
+    (BELOW: Mem.sup_include (sup_add sp' sps') support)
+  ```
+  We elide a dicussion of similar changes.
+
+- Finally, Theorem 3.1 is defined in `driver/Compiler.v` as the
+  following Coq theorem:
+  ```
+  Theorem transf_c_program_correct:
+    forall p tp,
+    transf_c_program p = OK tp ->
+    backward_simulation (Csem.semantics p) (Asm.semantics tp).
+  ```
 
