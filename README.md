@@ -254,7 +254,7 @@ very big and listed as follows:
         set_locals f.(fn_vars) (set_params vargs f.(fn_params)) = e ->
         step (Callstate (Internal f) vargs k m)
           E0 (State f f.(fn_body) k (Vptr sp Ptrofs.zero) e m')
-   ...
+    ...
    ```
 
    to 
