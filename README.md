@@ -15,8 +15,8 @@ corresponding top-level directory (we have included a copy of CompCert
 v3.8 for comparison and reference). The artifact accompanies the
 following paper:
 
-  > *Verified Compilation of C Programs with a Nominal Memory Model*.
-    Yuting Wang, Ling Zhang, Zhong Shao and Jeremie Koenig
+> *Verified Compilation of C Programs with a Nominal Memory Model*.
+  Yuting Wang, Ling Zhang, Zhong Shao and Jeremie Koenig
 
 As described in the paper, these extensions are developed
 incrementally, with Nominal CompCert as the basic extension of
@@ -26,26 +26,27 @@ introduced in the paper. Moreover, they correspond to the main claims
 we make in Section 1.3 of the paper, as follows:
 
 1. The nominal memory model is a natural extension of the block-based
-memory model. It enables flexible formalization of block ids and
-eliminates global assumptions on memory space. These claims are
-justified by the general realization of nominal memory model in Nominal
-CompCert.
+   memory model. It enables flexible formalization of block ids and
+   eliminates global assumptions on memory space. These claims are
+   justified by the general realization of nominal memory model in
+   Nominal CompCert.
 
 2. Nominal CompCert is an extension with the full compilation chain of
-CompCert verified and a general framework for verified compilation of
-C programs. This is justified by the implementation of Nominal CompCert.
+   CompCert verified and a general framework for verified compilation
+   of C programs. This is justified by the implementation of Nominal
+   CompCert.
 
 3. We developed an extension of Nominal CompCert that enables
-intuitive reasoning of compiler transformations on partial
-memory. This is justified by Nominal CompCert with Structured Memory
-Space.
+   intuitive reasoning of compiler transformations on partial
+   memory. This is justified by Nominal CompCert with Structured
+   Memory Space.
 
 4. We developed extensions of Nominal CompCert that enable modular
-reasoning about open programs with contextual memory. This is justified
-by Stack-Aware Nominal CompCert and Multi-Stack CompCert.
+   reasoning about open programs with contextual memory. This is
+   justified by Stack-Aware Nominal CompCert and Multi-Stack CompCert.
 
 5. The above developments are lightweight and easy to adopt. This can
-be observed by comparing our extensions with CompCert v3.8.
+   be observed by comparing our extensions with CompCert v3.8.
 
 We shall delve into the details of these extensions later.
 
@@ -70,8 +71,8 @@ the virtual machine). To compile the source code of each extension,
 enter its directory, run the following commands:
 
 ```
- ./configure x86_64-linux
- make
+./configure x86_64-linux
+make
 ```
 
 The compilation should start and terminate successfully.  
@@ -82,7 +83,7 @@ After that,
 you can navigate the source code by using emacs. For example, running
 
 ```
-  emacs common/Memory.v
+emacs common/Memory.v
 ```
 
 opens the emacs window in proof-general mode for browsing the file
@@ -94,7 +95,7 @@ presentation. Simply run the following command (which needs
 `coq2html` which has been installed on the VM)
 
 ```
- make documentation
+make documentation
 ```
 
 Then, the html versions of source code can be found at `doc/html`.
@@ -105,8 +106,8 @@ To check that our CompCert extensions work for compilation, you can
 run the test cases in the `test` directory, as follows:
 
 ```
-  make
-  make test
+make
+make test
 ```
 
 
@@ -176,7 +177,7 @@ very big and listed as follows:
   invariant `match_stacks_cons` assumes:
 
   ```
-    (BELOW: Plt sp' bound)
+  (BELOW: Plt sp' bound)
   ```
 
   which guarantees that `sp'` is a valid block.  In Nominal CompCert,
@@ -184,9 +185,9 @@ very big and listed as follows:
   proposition is broken into two:
 
   ```
-    (SPS': sp' = fresh_block sps')
-    ...
-    (BELOW: Mem.sup_include (sup_add sp' sps') support)
+  (SPS': sp' = fresh_block sps')
+  ...
+  (BELOW: Mem.sup_include (sup_add sp' sps') support)
   ```
 
   We elide a discussion of similar changes.
@@ -203,422 +204,427 @@ very big and listed as follows:
 
 ## Extension 2: Nominal CompCert with Structured Memory Space
 
-   This extension is implemented in the directory
-   `Nominal-CompCert-Struct-Memspace` and correspond to the contents
-   in Section 4 and 5.1.
+This extension is implemented in the directory
+`Nominal-CompCert-Struct-Memspace` and correspond to the contents in
+Section 4 and 5.1.
 
 ### Nominal memory model with structured space
 
-  This instantiation of nominal memory model is introduced in Section
-  4.1. Its constituents are described as follows:
+This instantiation of nominal memory model is introduced in Section
+4.1. Its constituents are described as follows:
 
-  - (Section 4.1.1) `fid`, `path` and the module `Block` are defined in
-    `common/Values.v`.
+- (Section 4.1.1) `fid`, `path` and the module `Block` are defined in
+  `common/Values.v`.
 
-  - (Section 4.1.2) `stree` is defined in `common/Memory.v`, together
-    with its operations `next_stree`, `next_block_stree`,
-    `return_stree` and `stree_in` and their properties. A well-founded
-    induction principle `stree_ind` is also established for induction
-    over strees.
+- (Section 4.1.2) `stree` is defined in `common/Memory.v`, together
+  with its operations `next_stree`, `next_block_stree`,
+  `return_stree` and `stree_in` and their properties. A well-founded
+  induction principle `stree_ind` is also established for induction
+  over strees.
 
-  - (Section 4.1.3) The formalization of support, i.e., module `Sup`,
-    is defined in `common/Memory.v`. 
+- (Section 4.1.3) The formalization of support, i.e., module `Sup`,
+  is defined in `common/Memory.v`. 
 
-  - (Section 4.1.4) The memory operations `alloc_glob`, `alloc_frame`,
-    `return_frame` and `alloc_block` are defined in `common/Memory.v`.
-    Essential properties about these operations are also proved there.
+- (Section 4.1.4) The memory operations `alloc_glob`, `alloc_frame`,
+  `return_frame` and `alloc_block` are defined in `common/Memory.v`.
+  Essential properties about these operations are also proved there.
 
 ### Nominal CompCert with structured memory space
 
-  This extension is introduced in Section 4.2. The updates to semantics
-  of CompCert's languages are as follows:
+This extension is introduced in Section 4.2. The updates to semantics
+of CompCert's languages are as follows:
 
-  - (Lines 713-715) Originally, the allocation global variables in the
-   function `alloc_global` in `common/Globalenvs.v` is done by using
-   the `alloc` method. In this extension, `alloc_global` is used instead.
+- (Lines 713-715) Originally, the allocation global variables in the
+ function `alloc_global` in `common/Globalenvs.v` is done by using
+ the `alloc` method. In this extension, `alloc_global` is used instead.
 
-  - (Line 716) `alloc_frame` and `return_frame` are added to function
-    calls and returns. For example, in Cminor, the small-step
-    transition is changed from
+- (Line 716) `alloc_frame` and `return_frame` are added to function
+  calls and returns. For example, in Cminor, the small-step
+  transition is changed from
 
-    ```
-    Inductive step: state -> trace -> state -> Prop :=
-    ...
-    | step_return_0: forall f k sp e m m',
-        Mem.free m sp 0 f.(fn_stackspace) = Some m' ->
-        step (State f (Sreturn None) k (Vptr sp Ptrofs.zero) e m)
-          E0 (Returnstate Vundef (call_cont k) m')
-    ...
-    | step_internal_function: forall f vargs k m m' sp e,
-        Mem.alloc m 0 f.(fn_stackspace) = (m', sp) ->
-        set_locals f.(fn_vars) (set_params vargs f.(fn_params)) = e ->
-        step (Callstate (Internal f) vargs k m)
-          E0 (State f f.(fn_body) k (Vptr sp Ptrofs.zero) e m')
-    ...
-    ```
-
-    to 
-
-    ```
-    Inductive step: state -> trace -> state -> Prop :=
-    ...
-    | step_return_0: forall f k sp e m m' m'',
+  ```
+  Inductive step: state -> trace -> state -> Prop :=
+  ...
+  | step_return_0: forall f k sp e m m',
       Mem.free m sp 0 f.(fn_stackspace) = Some m' ->
-      Mem.return_frame m' = Some m'' ->
       step (State f (Sreturn None) k (Vptr sp Ptrofs.zero) e m)
-        E0 (Returnstate Vundef (call_cont k) m'')
-    ...
-    | step_internal_function: forall f vargs k m m' m'' sp e path id,
-      Mem.alloc_frame m id = (m', path) ->
-      Mem.alloc m' 0 f.(fn_stackspace) = (m'', sp) ->
+        E0 (Returnstate Vundef (call_cont k) m')
+  ...
+  | step_internal_function: forall f vargs k m m' sp e,
+      Mem.alloc m 0 f.(fn_stackspace) = (m', sp) ->
       set_locals f.(fn_vars) (set_params vargs f.(fn_params)) = e ->
-      step (Callstate (Internal f) vargs k m id)
-        E0 (State f f.(fn_body) k (Vptr sp Ptrofs.zero) e m'')
-    ...
-    ```
+      step (Callstate (Internal f) vargs k m)
+        E0 (State f f.(fn_body) k (Vptr sp Ptrofs.zero) e m')
+  ...
+  ```
 
-  - (Line 717) In our artifact, `alloc` is updated to have the same
-    implementation as `alloc_block`. Therefore, we have reused the
-    `alloc` method for allocation of stack blocks.
+  to 
 
-  - With the above changes, we are able to update the complete proofs
-    of CompCert, the final correctness theorem is again found at
-    `transf_c_program_correct` in `driver/Compiler.v`.
+  ```
+  Inductive step: state -> trace -> state -> Prop :=
+  ...
+  | step_return_0: forall f k sp e m m' m'',
+    Mem.free m sp 0 f.(fn_stackspace) = Some m' ->
+    Mem.return_frame m' = Some m'' ->
+    step (State f (Sreturn None) k (Vptr sp Ptrofs.zero) e m)
+      E0 (Returnstate Vundef (call_cont k) m'')
+  ...
+  | step_internal_function: forall f vargs k m m' m'' sp e path id,
+    Mem.alloc_frame m id = (m', path) ->
+    Mem.alloc m' 0 f.(fn_stackspace) = (m'', sp) ->
+    set_locals f.(fn_vars) (set_params vargs f.(fn_params)) = e ->
+    step (Callstate (Internal f) vargs k m id)
+      E0 (State f f.(fn_body) k (Vptr sp Ptrofs.zero) e m'')
+  ...
+  ```
+
+- (Line 717) In our artifact, `alloc` is updated to have the same
+  implementation as `alloc_block`. Therefore, we have reused the
+  `alloc` method for allocation of stack blocks.
+
+- With the above changes, we are able to update the complete proofs
+  of CompCert, the final correctness theorem is again found at
+  `transf_c_program_correct` in `driver/Compiler.v`.
 
 ### Intuitive proofs for partial memory transformation
 
-  This corresponds to the discussion in Section 4.3. We have updated
-  the proofs for `SimplLocals`, `Cminorgen`, `Unusedglob` and
-  `Stacking` to use structural memory injections. They are formalized
-  in `cfrontend/SimplLocalsproof.v`, `cfronend/Cminorgenproof.v`,
-  `backend/Unusedglobproof.v` and `backend/Stackingproof.v`.
+This corresponds to the discussion in Section 4.3. We have updated
+the proofs for `SimplLocals`, `Cminorgen`, `Unusedglob` and
+`Stacking` to use structural memory injections. They are formalized
+in `cfrontend/SimplLocalsproof.v`, `cfronend/Cminorgenproof.v`,
+`backend/Unusedglobproof.v` and `backend/Stackingproof.v`.
 
-  - (Section 4.3.1) For each pass, its structural memory injection is
-    defined as the function `struct_meminj`. The implementation of
-    `struct_meminj` varies with different passes. For example,
-    `struct_meminj` for `Unusedglobal` (lines 764-769) is defined in
-    `backend/Unusedglobproof.v` as follows:
-   
-    ```
-    Definition check_block (s:sup): block -> bool :=
-      fun b =>
-        match b with
-        |Global id => match Genv.find_symbol tge id with
-                       |Some _ => true | None => false
-                     end
-        |Stack _ _ _ => if Mem.sup_dec b s then true else false
-                     end.
-    
-    Definition struct_meminj (s:sup) :=
-      fun b => if check_block s b then Some (b,0) else None.
-    ```
+- (Section 4.3.1) For each pass, its structural memory injection is
+  defined as the function `struct_meminj`. The implementation of
+  `struct_meminj` varies with different passes. For example,
+  `struct_meminj` for `Unusedglobal` (lines 764-769) is defined in
+  `backend/Unusedglobproof.v` as follows:
+ 
+  ```
+  Definition check_block (s:sup): block -> bool :=
+    fun b =>
+      match b with
+      |Global id => match Genv.find_symbol tge id with
+                     |Some _ => true | None => false
+                   end
+      |Stack _ _ _ => if Mem.sup_dec b s then true else false
+                   end.
+  
+  Definition struct_meminj (s:sup) :=
+    fun b => if check_block s b then Some (b,0) else None.
+  ```
 
-    and `struct_meminj` for `Cminorgen` (lines 804-809) is defined in
-    `cfrontend/Cminorgenproof.v` as follows:
+  and `struct_meminj` for `Cminorgen` (lines 804-809) is defined in
+  `cfrontend/Cminorgenproof.v` as follows:
 
-    ```
-    Definition unchecked_meminj : meminj :=
-      fun b => match b with
-        |Stack (Some id) path pos =>
-          match find_frame_offset id pos with
-            | Some o =>
-          Some ((Stack (Some id) path 1),o)
-            | None => None
-          end
-        |_ => Some (b,0)
-        end.
-    
-    Definition struct_meminj (s:sup) : meminj :=
-      fun b => if Mem.sup_dec b s then
-               unchecked_meminj b else None.
-    ```
+  ```
+  Definition unchecked_meminj : meminj :=
+    fun b => match b with
+      |Stack (Some id) path pos =>
+        match find_frame_offset id pos with
+          | Some o =>
+        Some ((Stack (Some id) path 1),o)
+          | None => None
+        end
+      |_ => Some (b,0)
+      end.
+  
+  Definition struct_meminj (s:sup) : meminj :=
+    fun b => if Mem.sup_dec b s then
+             unchecked_meminj b else None.
+  ```
 
-  - (Section 4.3.2 and 4.3.3.) With the structured memory injection,
-    we are able to simplify the reasoning about stack memory. For
-    example, in `Unusedglobalproof.v`, the invariant
-    `match_states_regular` now carries two new assumptions:
+- (Section 4.3.2 and 4.3.3.) With the structured memory injection,
+  we are able to simplify the reasoning about stack memory. For
+  example, in `Unusedglobalproof.v`, the invariant
+  `match_states_regular` now carries two new assumptions:
 
-    ```
-    (SMJ: j = struct_meminj (Mem.support m))
-    (MSTK: Mem.stack(Mem.support m) = Mem.stack(Mem.support tm))
-    ```
+  ```
+  (SMJ: j = struct_meminj (Mem.support m))
+  (MSTK: Mem.stack(Mem.support m) = Mem.stack(Mem.support tm))
+  ```
 
-    Here, `SMJ` asserts that the injection is a structural one, while
-    `MSTK` asserts that the stack tree is exactly the same before and
-    after the transformation (as `Unusedglob` does not touch stack at
-    all). With this very precise invariant (thanks to the structural
-    injection), we know that at any point of regular execution, the
-    stack frames are not changed at all. As a result, the proof
-    becomes much more intuitive.
+  Here, `SMJ` asserts that the injection is a structural one, while
+  `MSTK` asserts that the stack tree is exactly the same before and
+  after the transformation (as `Unusedglob` does not touch stack at
+  all). With this very precise invariant (thanks to the structural
+  injection), we know that at any point of regular execution, the
+  stack frames are not changed at all. As a result, the proof
+  becomes much more intuitive.
 
-    Similar observations can be made for other passes. For example, in
-    `SimplLocalsproof.v`, we have the following new invariants:
-   
-    ```
-    (VINJ: j = struct_meminj (Mem.support m))
-    (MSTK: Mem.stackseq m tm)
-    ```
+  Similar observations can be made for other passes. For example, in
+  `SimplLocalsproof.v`, we have the following new invariants:
+ 
+  ```
+  (VINJ: j = struct_meminj (Mem.support m))
+  (MSTK: Mem.stackseq m tm)
+  ```
 
-    where `Mem.stackseq` holds if the stack trees have the same
-    structure. This help us convert reasoning about the whole stack
-    memory into that for individual stack frames.
+  where `Mem.stackseq` holds if the stack trees have the same
+  structure. This help us convert reasoning about the whole stack
+  memory into that for individual stack frames.
 
 ### Verified compilation of programs with contextual memory
 
-  The above definitions of structural memory injection already assumes
-  that stack blocks allocated by external function calls are mapped to
-  themselves. Therefore, the assumption of compilation under
-  contextual programs is already manifested in this extension, as discussed
-  in Section 5.1.
+The above definitions of structural memory injection already assumes
+that stack blocks allocated by external function calls are mapped to
+themselves. Therefore, the assumption of compilation under contextual
+programs is already manifested in this extension, as discussed in
+Section 5.1.
 
 
 ## Extension 3: Stack-Aware Nominal CompCert
 
-  This extension is implemented in the directory
-  `Stack-Aware-Nominal-CompCert` and correspond to the contents in
-  Section 5.2. 
+This extension is implemented in the directory
+`Stack-Aware-Nominal-CompCert` and correspond to the contents in
+Section 5.2.
 
-  - (Definition 5.1) The abstract stack is defined in
-    `common/Memory.v`. In particular, the section `STACKADT` contains
-    the following formalization of Definition 5.1:
+- (Definition 5.1) The abstract stack is defined in
+  `common/Memory.v`. In particular, the section `STACKADT` contains
+  the following formalization of Definition 5.1:
+
+  ```
+  Record frame : Type :=
+  {
+    frame_size : Z;
+    frame_size_pos: (0 <= frame_size)%Z;
+  }.
+  
+  Definition stage := list frame.
+  Definition stackadt := list stage.
+  ```
+  
+- (Line 901) The function `stack_size` calculates the size of an abstract
+  stack by adding all the sizes of its frames together, as follows:
+  
+  ```
+  Fixpoint stack_size (s:stackadt): Z :=
+    match s with
+    |nil => 0
+    |hd::tl => size_of_all_frames hd + stack_size tl
+    end.
+  ```
+  
+  Note that this is an over-approximation of the size consumption
+  when a stage contains multiple frames allocated by a sequences of
+  tail calls because only the top-most tail call is alive.
+
+  Necessary properties about this function are also proved.
+
+- (Line 902) The maximal stack size is defined as the following constant:
+
+  ```
+  Definition max_stacksize : Z := 4096.
+  ```
+
+- (Lines 902-905)The new support has the following type
+  
+  ```
+  Record sup' : Type := mksup {
+    stack : stree;
+    astack : stackadt;
+    global : list ident;
+  }.
+  ```
+
+- (Lines 906-915) The functions for manipuating the abstract stack,
+  including `push_stage`, `record_frame` (i.e., `record` in the
+  paper) and `pop_stage` are defined in `common/Memory.v`, together
+  with a collection of properties about them.
+
+- (Lines 916-921) To prove semantics preservation, we updated the
+  semantics of each language with operations over abstract stack
+  using the `stackspace` oracle. We take `cfrontend/Clight.v` as an
+  example:
+
+  + The following parameter denotes the oracle `stackspace` in the paper:
 
     ```
-    Record frame : Type :=
-    {
-      frame_size : Z;
-      frame_size_pos: (0 <= frame_size)%Z;
-    }.
+    Variable fn_stack_requirements : ident -> Z.
+    ```
+
+  + On function entry, a new stage is created and a frame is
+    recorded whose size is determined by the oracle. For example, we
+    have
     
-    Definition stage := list frame.
-    Definition stackadt := list stage.
     ```
-    
-  - (Line 901) The function `stack_size` calculates the size of an abstract
-    stack by adding all the sizes of its frames together, as follows:
-    
-    ```
-    Fixpoint stack_size (s:stackadt): Z :=
-      match s with
-      |nil => 0
-      |hd::tl => size_of_all_frames hd + stack_size tl
-      end.
-    ```
-    
-    Note that this is an over-approximation of the size consumption
-    when a stage contains multiple frames allocated by a sequences of
-    tail calls because only the top-most tail call is alive.
-
-    Necessary properties about this function are also proved.
-
-  - (Line 902) The maximal stack size is defined as the following constant:
-
-    ```
-    Definition max_stacksize : Z := 4096.
-    ```
-
-  - (Lines 902-905)The new support has the following type
-    
-    ```
-    Record sup' : Type := mksup {
-      stack : stree;
-      astack : stackadt;
-      global : list ident;
-    }.
-    ```
-
-  - (Lines 906-915) The functions for manipuating the abstract stack,
-    including `push_stage`, `record_frame` (i.e., `record` in the
-    paper) and `pop_stage` are defined in `common/Memory.v`, together
-    with a collection of properties about them.
- 
-  - (Lines 916-921) To prove semantics preservation, we updated the
-    semantics of each language with operations over abstract stack
-    using the `stackspace` oracle. We take `cfrontend/Clight.v` as an
-    example:
-
-    + The following parameter denotes the oracle `stackspace` in the paper:
-
-      ```
-      Variable fn_stack_requirements : ident -> Z.
-      ```
-
-    + On function entry, a new stage is created and a frame is
-      recorded whose size is determined by the oracle. For example, we
-      have
-      
-      ```
-      Inductive function_entry1 (ge: genv) (f: function) (vargs: list val) (m: mem) (e: env) (le: temp_env) (m': mem) (id:ident) : Prop :=
-      | function_entry1_intro: forall m0 m1 m2 path,
-        ...
-        (* push_stage and record_frame *)
-        Mem.record_frame (Mem.push_stage m1) (Memory.mk_frame (fn_stack_requirements id )) = Some m2 ->
-        ...
-      ```
-
-    + On function return, the top-most stage is popped. For example, we have
-
-      ```
-      Inductive step: state -> trace -> state -> Prop :=
+    Inductive function_entry1 (ge: genv) (f: function) (vargs: list val) (m: mem) (e: env) (le: temp_env) (m': mem) (id:ident) : Prop :=
+    | function_entry1_intro: forall m0 m1 m2 path,
       ...
-      | step_return_0: forall f k e le m m' m'' m''',
-        Mem.free_list m (blocks_of_env e) = Some m' ->
-        Mem.return_frame m' = Some m'' ->
-        (* pop_stage *)
-        Mem.pop_stage m'' = Some m''' ->
-        step (State f (Sreturn None) k e le m) 
-             E0 (Returnstate Vundef (call_cont k) m''')
+      (* push_stage and record_frame *)
+      Mem.record_frame (Mem.push_stage m1) (Memory.mk_frame (fn_stack_requirements id )) = Some m2 ->
       ...
-      ```
+    ```
 
-    + The semantics preservation theorems now use the updated semantics
-      and depend on the oracle. For example, the simulation thoerem in
-      `cfronend/SimplLocalsproof.v` is stated as follows:
+  + On function return, the top-most stage is popped. For example, we have
 
-      ```
-      Theorem transf_program_correct:
-        forward_simulation (semantics1 fn_stack_requirements prog)
-                           (semantics2 fn_stack_requirements tprog).
-      ```
+    ```
+    Inductive step: state -> trace -> state -> Prop :=
+    ...
+    | step_return_0: forall f k e le m m' m'' m''',
+      Mem.free_list m (blocks_of_env e) = Some m' ->
+      Mem.return_frame m' = Some m'' ->
+      (* pop_stage *)
+      Mem.pop_stage m'' = Some m''' ->
+      step (State f (Sreturn None) k e le m) 
+           E0 (Returnstate Vundef (call_cont k) m''')
+    ...
+    ```
 
-  - (Lines 922-930) The new proofs for inlining and tailcall relies on
-    two semantics for RTL that caculates stack consumption in
-    two different ways: 
-    
-    + In `backend/RTL.v`, a regular call pushes a new stage while a
-      tailcall does not. When an internal function is entered, a new
-      frame is recorded on the top-most stage. Since `stack_size`
-      caculates the stack size by adding up the sizes of frames, the
-      stack size consumptions incurred by regular calls and tail calls
-      to the same function are the same. This matches with the
-      description in Fig. 8 and is formalized in the following
-      definition of the small-step transition:
-    
-      ```
-      Inductive step: state -> trace -> state -> Prop :=
-      ...
-      | exec_Icall:
-          forall s f sp pc rs m sig ros args res pc' fd id,
-          ...
-          (* push_stage *)
-          step (State s f sp pc rs m)
-               E0 (Callstate (Stackframe res f sp pc' rs :: s) fd rs##args (Mem.push_stage m) id)
-      | exec_Itailcall:
-        forall s f stk pc rs m sig ros args fd m' m'' id,
-          ...
-          (* No push_stage *)
-          step (State s f (Vptr stk Ptrofs.zero) pc rs m)
-               E0 (Callstate s fd rs##args m'' id)
-      | exec_function_internal:
-        forall s f args m m' m'' stk id path m''',
-          ...
-          (* record_frame *)
-          Mem.record_frame m'' (Memory.mk_frame (fn_stack_requirements id)) = Some m''' ->
-          step (Callstate s (Internal f) args m id)
-               E0 (State s f (Vptr stk Ptrofs.zero) f.(fn_entrypoint)
-                   (init_regs args f.(fn_params)) m''')
-      | exec_return:
-        forall res f sp pc rs s vres m m',
-          (* pop_stage *)
-          Mem.pop_stage m = Some m' ->
-          step (Returnstate (Stackframe res f sp pc rs :: s) vres m)
-               E0 (State s f sp pc (rs#res <- vres) m').
-      ...
-      ```
+  + The semantics preservation theorems now use the updated semantics
+    and depend on the oracle. For example, the simulation thoerem in
+    `cfronend/SimplLocalsproof.v` is stated as follows:
 
-    + In `backend/RTLmach.v`, the `push_stage` and `record_frame` are
-      merged and only happen when entering an internal
-      function. Moreover, the top-most stage is popped upon a
-      tailcall. As a result, the abstrat stack now matches with the
-      call stack, such that each of its stage contains only one frame
-      corresponding to an actiation record. Moreover, the result of
-      applying `stack_size` on this abstract stack is the actual stack
-      consumption at the machine level (hence the name
-      `RTLmach`). This is formalized in the definition of the
-      small-step transition, as follows:
+    ```
+    Theorem transf_program_correct:
+      forward_simulation (semantics1 fn_stack_requirements prog)
+                         (semantics2 fn_stack_requirements tprog).
+    ```
 
-      ```
-      Inductive step: state -> trace -> state -> Prop :=
-      ...
-      | exec_Icall:
+- (Lines 922-930) The new proofs for inlining and tailcall relies on
+  two semantics for RTL that caculates stack consumption in
+  two different ways: 
+  
+  + In `backend/RTL.v`, a regular call pushes a new stage while a
+    tailcall does not. When an internal function is entered, a new
+    frame is recorded on the top-most stage. Since `stack_size`
+    caculates the stack size by adding up the sizes of frames, the
+    stack size consumptions incurred by regular calls and tail calls
+    to the same function are the same. This matches with the
+    description in Fig. 8 and is formalized in the following
+    definition of the small-step transition:
+  
+    ```
+    Inductive step: state -> trace -> state -> Prop :=
+    ...
+    | exec_Icall:
         forall s f sp pc rs m sig ros args res pc' fd id,
         ...
-        (* No operation on the abstract stack *)
+        (* push_stage *)
         step (State s f sp pc rs m)
-             E0 (Callstate (Stackframe res f sp pc' rs :: s) fd rs##args m id)
-      | exec_Itailcall:
-        forall s f stk pc rs m sig ros args fd m' id m'' m''',
+             E0 (Callstate (Stackframe res f sp pc' rs :: s) fd rs##args (Mem.push_stage m) id)
+    | exec_Itailcall:
+      forall s f stk pc rs m sig ros args fd m' m'' id,
         ...
-        (* pop_stage *)
-        Mem.pop_stage m'' = Some m''' ->
+        (* No push_stage *)
         step (State s f (Vptr stk Ptrofs.zero) pc rs m)
-             E0 (Callstate s fd rs##args m''' id)
-      | exec_function_internal:
-        forall s f args m m' m'' m''' stk id path,
+             E0 (Callstate s fd rs##args m'' id)
+    | exec_function_internal:
+      forall s f args m m' m'' stk id path m''',
         ...
-        (* push_stage and record_frame *)
-        Mem.record_frame (Mem.push_stage m'')(Memory.mk_frame (fn_stack_requirements id)) = Some m''' ->
+        (* record_frame *)
+        Mem.record_frame m'' (Memory.mk_frame (fn_stack_requirements id)) = Some m''' ->
         step (Callstate s (Internal f) args m id)
              E0 (State s f (Vptr stk Ptrofs.zero) f.(fn_entrypoint)
                  (init_regs args f.(fn_params)) m''')
-      | exec_Ireturn:
-        forall s f stk pc rs m or m' m'' m''',
-        ...
+    | exec_return:
+      forall res f sp pc rs s vres m m',
         (* pop_stage *)
-        Mem.pop_stage m'' = Some m''' ->
-        step (State s f (Vptr stk Ptrofs.zero) pc rs m)
-             E0 (Returnstate s (regmap_optget or Vundef rs) m''')
+        Mem.pop_stage m = Some m' ->
+        step (Returnstate (Stackframe res f sp pc rs :: s) vres m)
+             E0 (State s f sp pc (rs#res <- vres) m').
+    ...
+    ```
+
+  + In `backend/RTLmach.v`, the `push_stage` and `record_frame` are
+    merged and only happen when entering an internal
+    function. Moreover, the top-most stage is popped upon a
+    tailcall. As a result, the abstrat stack now matches with the
+    call stack, such that each of its stage contains only one frame
+    corresponding to an actiation record. Moreover, the result of
+    applying `stack_size` on this abstract stack is the actual stack
+    consumption at the machine level (hence the name
+    `RTLmach`). This is formalized in the definition of the
+    small-step transition, as follows:
+
+    ```
+    Inductive step: state -> trace -> state -> Prop :=
+    ...
+    | exec_Icall:
+      forall s f sp pc rs m sig ros args res pc' fd id,
       ...
-      ```      
-
-    + We define an identity transformation at the RTL level in
-      `backend/RTLmachproof.v`:
-
-      ```
-      Definition transf_program (p: program) : program := p.
-      ```
-
-      We then prove the forward simulation between the above two
-      semantics over the same RTL program in `backend/RTLmachproof.v`:
-
-      ```
-      Theorem transf_program_correct:
-        forward_simulation (RTL.semantics fn_stack_requirements prog)
-                           (RTLmach.semantics fn_stack_requirements tprog).
-      ```
-
-      We insert the identity transformation into the compilation chain
-      after `Inlining` in `driver/Compiler.v` and use the above
-      simulation theorem to prove its correctness.
-
-      ```
-      Definition transf_rtl_program (f: RTL.program) : res Asm.program :=
-      OK f
-      @@ print (print_RTL 0)
-      @@ total_if Compopts.optim_tailcalls (time "Tail calls" Tailcall.transf_program)
-      @@ print (print_RTL 1)
-      @@@ time "Inlining" Inlining.transf_program
-      @@ time "RTLmach" RTLmachproof.transf_program
+      (* No operation on the abstract stack *)
+      step (State s f sp pc rs m)
+           E0 (Callstate (Stackframe res f sp pc' rs :: s) fd rs##args m id)
+    | exec_Itailcall:
+      forall s f stk pc rs m sig ros args fd m' id m'' m''',
       ...
-      ```
-  - (Theorem 5.2) The final correctness theorem is defined in `driver/Compiler.v`, as follows:
+      (* pop_stage *)
+      Mem.pop_stage m'' = Some m''' ->
+      step (State s f (Vptr stk Ptrofs.zero) pc rs m)
+           E0 (Callstate s fd rs##args m''' id)
+    | exec_function_internal:
+      forall s f args m m' m'' m''' stk id path,
+      ...
+      (* push_stage and record_frame *)
+      Mem.record_frame (Mem.push_stage m'')(Memory.mk_frame (fn_stack_requirements id)) = Some m''' ->
+      step (Callstate s (Internal f) args m id)
+           E0 (State s f (Vptr stk Ptrofs.zero) f.(fn_entrypoint)
+               (init_regs args f.(fn_params)) m''')
+    | exec_Ireturn:
+      forall s f stk pc rs m or m' m'' m''',
+      ...
+      (* pop_stage *)
+      Mem.pop_stage m'' = Some m''' ->
+      step (State s f (Vptr stk Ptrofs.zero) pc rs m)
+           E0 (Returnstate s (regmap_optget or Vundef rs) m''')
+    ...
+    ```      
+
+  + We define an identity transformation at the RTL level in
+    `backend/RTLmachproof.v`:
 
     ```
-    Theorem transf_c_program_correct_real: forall p tp,
-      transf_c_program_real p = OK tp ->
-      backward_simulation (Csem.semantics (fn_stack_requirements tp) p) (RealAsm.semantics tp).
+    Definition transf_program (p: program) : program := p.
     ```
 
-    Note that the oracle `stackspace` is extracted from the target
-    program `tp` by calling `fn_stack_requirements` which is defined
-    as follows:
+    We then prove the forward simulation between the above two
+    semantics over the same RTL program in `backend/RTLmachproof.v`:
 
     ```
-    Definition fn_stack_requirements (tp: Asm.program) (id: ident) : Z :=
-       match Globalenvs.Genv.find_funct_ptr (Globalenvs.Genv.globalenv tp) (Values.Global id) with
-       | Some (Internal f) => Asm.fn_stacksize f
-       | _ => 0
-       end.
+    Theorem transf_program_correct:
+      forward_simulation (RTL.semantics fn_stack_requirements prog)
+                         (RTLmach.semantics fn_stack_requirements tprog).
     ```
+
+    We insert the identity transformation into the compilation chain
+    after `Inlining` in `driver/Compiler.v` and use the above
+    simulation theorem to prove its correctness.
+
+    ```
+    Definition transf_rtl_program (f: RTL.program) : res Asm.program :=
+    OK f
+    @@ print (print_RTL 0)
+    @@ total_if Compopts.optim_tailcalls (time "Tail calls" Tailcall.transf_program)
+    @@ print (print_RTL 1)
+    @@@ time "Inlining" Inlining.transf_program
+    @@ time "RTLmach" RTLmachproof.transf_program
+    ...
+    ```
+- (Theorem 5.2) The final correctness theorem is defined in `driver/Compiler.v`, as follows:
+
+  ```
+  Theorem transf_c_program_correct_real: forall p tp,
+    transf_c_program_real p = OK tp ->
+    backward_simulation (Csem.semantics (fn_stack_requirements tp) p) (RealAsm.semantics tp).
+  ```
+
+  Note that the oracle `stackspace` is extracted from the target
+  program `tp` by calling a concrete definition for
+  `fn_stack_requirements`, as follows:
+
+  ```
+  Definition fn_stack_requirements (tp: Asm.program) (id: ident) : Z :=
+     match Globalenvs.Genv.find_funct_ptr (Globalenvs.Genv.globalenv tp) (Values.Global id) with
+     | Some (Internal f) => Asm.fn_stacksize f
+     | _ => 0
+     end.
+  ```
 
 
 ## Extension 4: Multi-Stack CompCert
+
+This extension is implemented in the directory `Multi-Stack-CompCert`
+and correspond to the contents in Section 5.3 and 5.4.
+
+- 
