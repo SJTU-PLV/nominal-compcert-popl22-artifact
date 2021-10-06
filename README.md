@@ -222,8 +222,8 @@ very big and listed as follows:
 ## Extension 2: Nominal CompCert with Structured Memory Space
 
 This extension is implemented in the directory
-`Nominal-CompCert-Struct-Memspace` and correspond to the contents in
-Section 4 and 5.1.
+[`Nominal-CompCert-Struct-Memspace`](Nominal-CompCert-Struct-Memspace)
+and correspond to the contents in Section 4 and 5.1.
 
 ### Nominal memory model with structured space
 
@@ -318,14 +318,18 @@ of CompCert's languages are as follows:
 This corresponds to the discussion in Section 4.3. We have updated
 the proofs for `SimplLocals`, `Cminorgen`, `Unusedglob` and
 `Stacking` to use structural memory injections. They are formalized
-in `cfrontend/SimplLocalsproof.v`, `cfronend/Cminorgenproof.v`,
-`backend/Unusedglobproof.v` and `backend/Stackingproof.v`.
+in 
+[`cfrontend/SimplLocalsproof.v`](Nominal-CompCert-Struct-Memspace/cfrontend/SimplLocalsproof.v), 
+[`cfrontend/Cminorgenproof.v`](Nominal-CompCert-Struct-Memspace/cfrontend/Cminorgenproof.v),
+[`backend/Unusedglobproof.v`](Nominal-CompCert-Struct-Memspace/backend/Unusedglobproof.v) and 
+[`backend/Stackingproof.v`](Nominal-CompCert-Struct-Memspace/backend/Stackingproof.v).
 
 - (Section 4.3.1) For each pass, its structural memory injection is
   defined as the function `struct_meminj`. The implementation of
-  `struct_meminj` varies with different passes. For example,
+  `struct_meminj` varies for different passes. For example,
   `struct_meminj` for `Unusedglobal` (lines 764-769) is defined in
-  `backend/Unusedglobproof.v` as follows:
+  [`backend/Unusedglobproof.v`](Nominal-CompCert-Struct-Memspace/backend/Unusedglobproof.v) 
+  as follows:
  
   ```
   Definition check_block (s:sup): block -> bool :=
@@ -335,14 +339,15 @@ in `cfrontend/SimplLocalsproof.v`, `cfronend/Cminorgenproof.v`,
                      |Some _ => true | None => false
                    end
       |Stack _ _ _ => if Mem.sup_dec b s then true else false
-                   end.
+      end.
   
   Definition struct_meminj (s:sup) :=
     fun b => if check_block s b then Some (b,0) else None.
   ```
 
-  and `struct_meminj` for `Cminorgen` (lines 804-809) is defined in
-  `cfrontend/Cminorgenproof.v` as follows:
+  and `struct_meminj` for `Cminorgen` (lines 804-810) is defined in
+  [`cfrontend/Cminorgenproof.v`](Nominal-CompCert-Struct-Memspace/cfrontend/Cminorgenproof.v)
+   as follows:
 
   ```
   Definition unchecked_meminj : meminj :=
@@ -361,10 +366,12 @@ in `cfrontend/SimplLocalsproof.v`, `cfronend/Cminorgenproof.v`,
              unchecked_meminj b else None.
   ```
 
-- (Section 4.3.2 and 4.3.3.) With the structured memory injection,
-  we are able to simplify the reasoning about stack memory. For
-  example, in `Unusedglobalproof.v`, the invariant
-  `match_states_regular` now carries two new assumptions:
+- (Section 4.3.2 and 4.3.3) With the structured memory injection, we
+  are able to simplify the reasoning about stack memory. For example,
+  in
+  [`Unusedglobproof.v`](Nominal-CompCert-Struct-Memspace/backend/Unusedglobproof.v),
+  the invariant `match_states_regular` now carries two new
+  assumptions:
 
   ```
   (SMJ: j = struct_meminj (Mem.support m))
@@ -373,14 +380,14 @@ in `cfrontend/SimplLocalsproof.v`, `cfronend/Cminorgenproof.v`,
 
   Here, `SMJ` asserts that the injection is a structural one, while
   `MSTK` asserts that the stack tree is exactly the same before and
-  after the transformation (as `Unusedglob` does not touch stack at
-  all). With this very precise invariant (thanks to the structural
-  injection), we know that at any point of regular execution, the
-  stack frames are not changed at all. As a result, the proof
-  becomes much more intuitive.
+  after the transformation (lines 799-800) as `Unusedglob` does not
+  touch stack at all. With this very precise invariant, we know that
+  at any point of regular execution, the stack frames are not changed
+  at all. As a result, the proof becomes much more intuitive.
 
   Similar observations can be made for other passes. For example, in
-  `SimplLocalsproof.v`, we have the following new invariants:
+  [`SimplLocalsproof.v`](Nominal-CompCert-Struct-Memspace/cfrontend/SimplLocalsproof.v),
+  we have the following new invariants:
  
   ```
   (VINJ: j = struct_meminj (Mem.support m))
@@ -393,22 +400,22 @@ in `cfrontend/SimplLocalsproof.v`, `cfronend/Cminorgenproof.v`,
 
 ### Verified compilation of programs with contextual memory
 
-The above definitions of structural memory injection already assumes
-that stack blocks allocated by external function calls are mapped to
-themselves. Therefore, the assumption of compilation under contextual
-programs is already manifested in this extension, as discussed in
-Section 5.1.
+(Section 5.1) The above definitions of structural memory injection
+already assumes that stack blocks allocated by external function calls
+are mapped to themselves. Therefore, the assumption of compilation
+under contextual programs is already manifested in this extension.
 
 
 ## Extension 3: Stack-Aware Nominal CompCert
 
 This extension is implemented in the directory
-`Stack-Aware-Nominal-CompCert` and correspond to the contents in
-Section 5.2.
+[`Stack-Aware-Nominal-CompCert`](Stack-Aware-Nominal-CompCert) and
+correspond to the contents in Section 5.2.
 
 - (Definition 5.1) The abstract stack is defined in
-  `common/Memory.v`. In particular, the section `STACKADT` contains
-  the following formalization of Definition 5.1:
+  [`common/Memory.v`](Stack-Aware-Nominal-CompCert/common/Memory.v). In
+  particular, the section `STACKADT` contains the following
+  formalization of Definition 5.1:
 
   ```
   Record frame : Type :=
@@ -436,7 +443,7 @@ Section 5.2.
   when a stage contains multiple frames allocated by a sequences of
   tail calls because only the top-most tail call is alive.
 
-  Necessary properties about this function are also proved.
+  Some important properties about this function are also proved.
 
 - (Line 902) The maximal stack size is defined as the following constant:
 
@@ -455,14 +462,16 @@ Section 5.2.
   ```
 
 - (Lines 906-915) The functions for manipuating the abstract stack,
-  including `push_stage`, `record_frame` (i.e., `record` in the
-  paper) and `pop_stage` are defined in `common/Memory.v`, together
-  with a collection of properties about them.
+  including `push_stage`, `record_frame` (i.e., `record` in the paper)
+  and `pop_stage` are defined in
+  [`common/Memory.v`](Stack-Aware-Nominal-CompCert/common/Memory.v),
+  together with a collection of properties about them.
 
 - (Lines 916-921) To prove semantics preservation, we updated the
-  semantics of each language with operations over abstract stack
-  using the `stackspace` oracle. We take `cfrontend/Clight.v` as an
-  example:
+  semantics of each language with operations over abstract stack using
+  the `stackspace` oracle. We take
+  [`cfrontend/Clight.v`](Stack-Aware-Nominal-CompCert/cfrontend/Clight.v)
+  as an example:
 
   + The following parameter denotes the oracle `stackspace` in the paper:
 
@@ -500,7 +509,8 @@ Section 5.2.
 
   + The semantics preservation theorems now use the updated semantics
     and depend on the oracle. For example, the simulation thoerem in
-    `cfronend/SimplLocalsproof.v` is stated as follows:
+    [`cfrontend/SimplLocalsproof.v`](Stack-Aware-Nominal-CompCert/cfrontend/SimplLocalsproof.v)
+    is stated as follows:
 
     ```
     Theorem transf_program_correct:
@@ -508,18 +518,19 @@ Section 5.2.
                          (semantics2 fn_stack_requirements tprog).
     ```
 
-- (Lines 922-930) The new proofs for inlining and tailcall relies on
-  two semantics for RTL that caculates stack consumption in
-  two different ways: 
+- (Lines 922-930) The new semantics preservation proofs rely on two
+  semantics for RTL that caculates stack consumption in two different
+  ways:
   
-  + In `backend/RTL.v`, a regular call pushes a new stage while a
-    tailcall does not. When an internal function is entered, a new
-    frame is recorded on the top-most stage. Since `stack_size`
-    caculates the stack size by adding up the sizes of frames, the
-    stack size consumptions incurred by regular calls and tail calls
-    to the same function are the same. This matches with the
-    description in Fig. 8 and is formalized in the following
-    definition of the small-step transition:
+  + In [`backend/RTL.v`](Stack-Aware-Nominal-CompCert/backend/RTL.v),
+    a regular call pushes a new stage while a tailcall does not. When
+    an internal function is entered, a new frame is recorded on the
+    top-most stage. Since `stack_size` caculates the stack size by
+    adding up the sizes of frames, the stack size consumptions
+    incurred by regular calls and tail calls to the same function are
+    the same. This matches with the description in Fig. 8 and is
+    formalized in the following definition of the small-step
+    transition:
   
     ```
     Inductive step: state -> trace -> state -> Prop :=
@@ -553,16 +564,17 @@ Section 5.2.
     ...
     ```
 
-  + In `backend/RTLmach.v`, the `push_stage` and `record_frame` are
-    merged and only happen when entering an internal
-    function. Moreover, the top-most stage is popped upon a
-    tailcall. As a result, the abstrat stack now matches with the
-    call stack, such that each of its stage contains only one frame
-    corresponding to an actiation record. Moreover, the result of
-    applying `stack_size` on this abstract stack is the actual stack
-    consumption at the machine level (hence the name
-    `RTLmach`). This is formalized in the definition of the
-    small-step transition, as follows:
+  + In
+    [`backend/RTLmach.v`](Stack-Aware-Nominal-CompCert/backend/RTLmach.v),
+    the `push_stage` and `record_frame` are merged and only happen
+    when entering an internal function. Moreover, the top-most stage
+    is popped upon a tailcall. As a result, the abstrat stack now
+    matches with the call stack, such that each of its stage contains
+    only one frame corresponding to an actiation record. Moreover, the
+    result of applying `stack_size` on this abstract stack is the
+    actual stack consumption at the machine level (hence the name
+    `RTLmach`). This is formalized in the definition of the small-step
+    transition, as follows:
 
     ```
     Inductive step: state -> trace -> state -> Prop :=
@@ -599,14 +611,15 @@ Section 5.2.
     ```      
 
   + We define an identity transformation at the RTL level in
-    `backend/RTLmachproof.v`:
+    [`backend/RTLmachproof.v`](Stack-Aware-Nominal-CompCert/backend/RTLmachproof.v):
 
     ```
     Definition transf_program (p: program) : program := p.
     ```
 
     We then prove the forward simulation between the above two
-    semantics over the same RTL program in `backend/RTLmachproof.v`:
+    semantics over the same RTL program in
+    [`backend/RTLmachproof.v`](Stack-Aware-Nominal-CompCert/backend/RTLmachproof.v):
 
     ```
     Theorem transf_program_correct:
@@ -615,8 +628,9 @@ Section 5.2.
     ```
 
     We insert the identity transformation into the compilation chain
-    after `Inlining` in `driver/Compiler.v` and use the above
-    simulation theorem to prove its correctness.
+    after `Inlining` in
+    [`driver/Compiler.v`](Stack-Aware-Nominal-CompCert/driver/Compiler.v)
+    and use the above simulation theorem to prove its correctness.
 
     ```
     Definition transf_rtl_program (f: RTL.program) : res Asm.program :=
@@ -629,26 +643,32 @@ Section 5.2.
     ...
     ```
 
-- The assembly language `Asm` is complied into `RealAsm` by following
+- The assembly language
+  [`Asm`](Stack-Aware-Nominal-CompCert/x86/Asm.v) is complied into
+  [`RealAsm`](Stack-Aware-Nominal-CompCert/x86/RealAsm.v) by following
   the same psses in Stack-Aware CompCert (see [1]). We have
   implemented and proved these passes for the x86 backend.
 
   + An alternative x86 assembly semantics (called `Single-Stack Asm`)
     that makes use of a single and contiguous stack is defined in
-    `x86/SSAsm.v`. Note that `Single-Stack Asm` still uses pseudo
-    registers and instructions like `Asm`. The forward simulation
-    between `Asm` semantics and `Single-Stack Asm` is proved in
-    `x86/SSAsmproof.v`. This proof makes critical use of abstract
-    stack to merge the individual stack frames into a single and
-    contiguous stack.
+    [`x86/SSAsm.v`](Stack-Aware-Nominal-CompCert/x86/SSAsm.v). Note
+    that `Single-Stack Asm` still uses pseudo registers and
+    instructions like `Asm`. The forward simulation between `Asm`
+    semantics and `Single-Stack Asm` is proved in
+    [`x86/SSAsmproof.v`](Stack-Aware-Nominal-CompCert/x86/SSAsmproof.v). This
+    proof makes critical use of abstract stack to merge the individual
+    stack frames into a single and contiguous stack.
 
-  + A third x86 semantics (called `RealAsm`) is defined
-    `x86/RealAsm.v`. `RealAsm` no longer relies on pseudo registers or
-    instructions. The forward simulation between `Single-Stack Asm`
-    and `RealAsm` is proved in `x86/RealAsmproof.v`. This proof is
-    almost identical to the one in Stack-Aware CompCert.
+  + A third x86 Asm semantics (i.e., `RealAsm`) is defined
+    [`x86/RealAsm.v`](Stack-Aware-Nominal-CompCert/x86/RealAsm.v). `RealAsm`
+    no longer relies on pseudo registers or instructions. The forward
+    simulation between `Single-Stack Asm` and `RealAsm` is proved in
+    [`x86/RealAsmproof.v`](Stack-Aware-Nominal-CompCert/x86/RealAsmproof.v). This
+    proof is almost identical to the one in Stack-Aware CompCert.
 
-- (Theorem 5.2) The final correctness theorem is defined in `driver/Compiler.v`, as follows:
+- (Theorem 5.2) The final correctness theorem is defined in
+  [`driver/Compiler.v`](Stack-Aware-Nominal-CompCert/driver/Compiler.v),
+  as follows:
 
   ```
   Theorem transf_c_program_correct_real: forall p tp,
@@ -671,10 +691,12 @@ Section 5.2.
 
 ## Extension 4: Multi-Stack CompCert
 
-This extension is implemented in the directory `Multi-Stack-CompCert`
-and correspond to the contents in Section 5.3 and 5.4.
+This extension is implemented in the directory
+[`Multi-Stack-CompCert`](Multi-Stack-CompCert) and correspond to the
+contents in Section 5.3 and 5.4.
 
-- (Lines 944-950) The definition of supports (in `common/Memory.v`) is
+- (Lines 944-950) The definition of supports (in
+  [`common/Memory.v`](Multi-Stack-CompCert/common/Memory.v) is
   generalized to contain multiple stack trees and abstract stacks:
 
   ```
@@ -701,7 +723,8 @@ and correspond to the contents in Section 5.3 and 5.4.
 
 - (Lines 954-962) The proofs of Stack-Aware Nominal CompCert are
   updated straightforwardly by using the above definitions. The final
-  theorem of Multi-Stack CompCert is located in `driver/Compiler.v`:
+  theorem of Multi-Stack CompCert is located in
+  [`driver/Compiler.v`](Multi-Stack-CompCert/driver/Compiler.v):
 
   ```
   Theorem transf_c_program_correct_real:
@@ -713,13 +736,13 @@ and correspond to the contents in Section 5.3 and 5.4.
   It looks similar to that of Stack-Aware Nominal CompCert, except
   that the semantics are updated with the usage of multiple stacks.
 
-- (Section 5.4.2) The thread-safe compilation is exactly the same as in
-  Multi-Stack CompCert. The thread-safe linking is part of the CCAL
+- (Section 5.4.2) The thread-safe compilation is exactly the same as
+  in Multi-Stack CompCert. The thread-safe linking is part of the CCAL
   framework which we do not include in this artifact. This is because
   the newest implementation of CCAL is based on a very old version of
   Coq (v8.4) which is not compatible with Coq v8.12 or CompCert
   v3.8. However, since the key concept of thread-safe linking (i.e.,
-  linking of multiple stacks, see [2]) is readily provided by our
+  linking of multiple stacks, see [2]) is fully supproted by our
   memory model with multiple and continguous stacks, its realization
   is trivial once the CCAL framework is updated to Coq v8.12.
 
