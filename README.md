@@ -461,7 +461,7 @@ correspond to the contents in Section 5.2.
   }.
   ```
 
-- (Lines 906-915) The functions for manipuating the abstract stack,
+- (Lines 906-915) The functions for manipulating the abstract stack,
   including `push_stage`, `record_frame` (i.e., `record` in the paper)
   and `pop_stage` are defined in
   [`common/Memory.v`](Stack-Aware-Nominal-CompCert/common/Memory.v),
@@ -508,7 +508,7 @@ correspond to the contents in Section 5.2.
     ```
 
   + The semantics preservation theorems now use the updated semantics
-    and depend on the oracle. For example, the simulation thoerem in
+    and depend on the oracle. For example, the simulation theorem in
     [`cfrontend/SimplLocalsproof.v`](Stack-Aware-Nominal-CompCert/cfrontend/SimplLocalsproof.v)
     is stated as follows:
 
@@ -519,15 +519,15 @@ correspond to the contents in Section 5.2.
     ```
 
 - (Lines 922-930) The new semantics preservation proofs rely on two
-  semantics for RTL that caculates stack consumption in two different
+  semantics for RTL that calculates stack consumption in two different
   ways:
   
   + In [`backend/RTL.v`](Stack-Aware-Nominal-CompCert/backend/RTL.v),
     a regular call pushes a new stage while a tailcall does not. When
     an internal function is entered, a new frame is recorded on the
-    top-most stage. Since `stack_size` caculates the stack size by
-    adding up the sizes of frames, the stack size consumptions
-    incurred by regular calls and tail calls to the same function are
+    top-most stage. Since `stack_size` calculates the stack size by
+    adding up the sizes of frames, the stack size consumption
+    incurred by regular calls and tail calls to the same function is
     the same. This matches with the description in Fig. 8 and is
     formalized in the following definition of the small-step
     transition:
@@ -568,9 +568,9 @@ correspond to the contents in Section 5.2.
     [`backend/RTLmach.v`](Stack-Aware-Nominal-CompCert/backend/RTLmach.v),
     the `push_stage` and `record_frame` are merged and only happen
     when entering an internal function. Moreover, the top-most stage
-    is popped upon a tailcall. As a result, the abstrat stack now
+    is popped upon a tailcall. As a result, the abstract stack now
     matches with the call stack, such that each of its stage contains
-    only one frame corresponding to an actiation record. Moreover, the
+    only one frame corresponding to an activation record. Moreover, the
     result of applying `stack_size` on this abstract stack is the
     actual stack consumption at the machine level (hence the name
     `RTLmach`). This is formalized in the definition of the small-step
@@ -646,7 +646,7 @@ correspond to the contents in Section 5.2.
 - The assembly language
   [`Asm`](Stack-Aware-Nominal-CompCert/x86/Asm.v) is complied into
   [`RealAsm`](Stack-Aware-Nominal-CompCert/x86/RealAsm.v) by following
-  the same psses in Stack-Aware CompCert (see [1]). We have
+  the same passes in Stack-Aware CompCert (see [1]). We have
   implemented and proved these passes for the x86 backend.
 
   + An alternative x86 assembly semantics (called `Single-Stack Asm`)
@@ -742,8 +742,8 @@ contents in Section 5.3 and 5.4.
   the newest implementation of CCAL is based on a very old version of
   Coq (v8.4) which is not compatible with Coq v8.12 or CompCert
   v3.8. However, since the key concept of thread-safe linking (i.e.,
-  linking of multiple stacks, see [2]) is fully supproted by our
-  memory model with multiple and continguous stacks, its realization
+  linking of multiple stacks, see [2]) is fully supported by our
+  memory model with multiple and contiguous stacks, its realization
   is trivial once the CCAL framework is updated to Coq v8.12.
 
 
