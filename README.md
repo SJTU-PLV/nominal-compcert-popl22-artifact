@@ -643,7 +643,8 @@ correspond to the contents in Section 5.2.
     ...
     ```
 
-- The assembly language
+- The verified compilation chain of vanilla CompCert ends at assmebly languages.
+  In this extension, the assembly language
   [`Asm`](Stack-Aware-Nominal-CompCert/x86/Asm.v) is complied into
   [`RealAsm`](Stack-Aware-Nominal-CompCert/x86/RealAsm.v) by following
   the same passes in Stack-Aware CompCert (see [1]). We have
