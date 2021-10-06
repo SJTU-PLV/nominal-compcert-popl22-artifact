@@ -5,18 +5,19 @@
 This artifact consists of a series of extensions to CompCert (v3.8)
 based on a nominal memory model, as follows:
 
-1. Nominal CompCert
-2. Nominal CompCert with Structured Memory Space
-3. Stack-Aware Nominal CompCert
-4. Multi-Stack CompCert
+1. [Nominal CompCert](Nominal-CompCert)
+2. [Nominal CompCert with Structured Memory Space](Nominal-CompCert-Struct-Memspace)
+3. [Stack-Aware Nominal CompCert](Stack-Aware-Nominal-CompCert)
+4. [Multi-Stack CompCert](Multi-Stack-CompCert)
 
 The complete source code of each extension can be found in a
 corresponding top-level directory (we have included a copy of CompCert
 v3.8 for comparison and reference). The artifact accompanies the
 following paper:
 
-> *Verified Compilation of C Programs with a Nominal Memory Model*.
-  Yuting Wang, Ling Zhang, Zhong Shao and Jeremie Koenig
+> [*Verified Compilation of C Programs with a Nominal Memory
+  Model*](paper/popl22ae-paper26.pdf). Yuting Wang, Ling Zhang, Zhong
+  Shao and Jeremie Koenig
 
 As described in the paper, these extensions are developed
 incrementally, with Nominal CompCert as the basic extension of
@@ -28,8 +29,8 @@ we make in Section 1.3 of the paper, as follows:
 1. The nominal memory model is a natural extension of the block-based
    memory model. It enables flexible formalization of block ids and
    eliminates global assumptions on memory space. These claims are
-   justified by the general realization of nominal memory model in
-   Nominal CompCert.
+   justified by the realization of nominal memory model in Nominal
+   CompCert.
 
 2. Nominal CompCert is an extension with the full compilation chain of
    CompCert verified and a general framework for verified compilation
@@ -56,9 +57,13 @@ We shall delve into the details of these extensions later.
 ### Prerequisites
 
 This artifact is based on CompCert v3.8 and needs Coq v8.12 to
-compile. All the required software have already been installed on the
-virtual machine. If you prefer to compiled the source code on your own
-computer, then we suggest you install the prerequisites via
+compile. 
+
+- If you are using the VM, you are set. All the required software have
+already been installed on the virtual machine. 
+
+- If you prefer to compiled the source code on your own computer, then
+we suggest you install the prerequisites via
 [opam](https://opam.ocaml.org/) and follow the standard installation
 steps in [the user's manual of
 CompCert](https://compcert.org/man/index.html) to compiler the source
@@ -75,7 +80,9 @@ enter its directory, run the following commands:
 make
 ```
 
-The compilation should start and terminate successfully.  
+The compilation should start and terminate successfully. Currently,
+the artifact only works for the x86 back-end because Stack-Awareness
+is only implemented for x86.
 
 ### Navigating the proofs
 
@@ -116,27 +123,31 @@ make test
 In the remaining sections, we present the details of each extension
 and show their correspondence to the discussion in the paper. We first
 discuss the nominal memory model and Nominal CompCert, which are
-implemented in the directory `Nominal-CompCert` and correspond to the
-contents in Section 3 of the paper.
+implemented in the directory [`Nominal-CompCert`](Nominal-CompCert)
+and correspond to the contents in Section 3 of the paper.
 
 ### Nominal memory model
 
 The nominal memory model is introduced Section 3.2. Its constituents
 are listed as follows:
 
-- The interface for nominal block ids `BLOCK` is defined in `common/Values.v`.
+- (Lines 459-464) The interface for nominal block ids `BLOCK` is
+  defined in [`common/Values.v`](Nominal-CompCert/common/Values.v).
 
-- The instantiation of `BLOCK` with positive ids is defined by the Coq
-  module `Block` in `common/Values.v`.
+- (Lines 509-511) The instantiation of `BLOCK` with positive ids is defined by the Coq
+  module `Block` in [`common/Values.v`](Nominal-CompCert/common/Values.v).
 
-- The interface for supports `SUP` is defined in `common/Memtype.v`.
+- (Lines 466- 483) The interface for supports `SUP` is defined in
+  [`common/Memtype.v`](Nominal-CompCert/common/Memtype.v).
 
-- The instantiation of supports as a list of block ids is defined by the module `Sup` in `common/Memory.v'.
+- (Lines 512-516) The instantiation of supports as a list of block ids is defined by
+  the module `Sup` in [`common/Memory.v`](Nominal-CompCert/common/Memory.v).
 
-- The updated memory state `mem` is defined in `common/Memory.v` with
-  a new field `support:sup`.  The updated definition of `valid_block`
-  can also be found in this file. The basic properties of the memory
-  model have been reproved with these changes.
+- (Lines 496-506) The updated memory state `mem` is defined in
+  [`common/Memory.v`](Nominal-CompCert/common/Memory.v) with a new
+  field `support:sup`.  The updated definition of `valid_block` can
+  also be found in this file. The basic properties of the memory model
+  have been reproved with these changes.
 
 ### Nominal CompCert
 
@@ -147,11 +158,11 @@ have discussed above, the changes w.r.t. CompCert are mainly about the
 semantics of languages and updates of proofs. These changes are not
 very big and listed as follows:
 
-- One main difference is that next blocks are replaced by supports
-  along with the related properties. For instance, in
-  `cfrontend/Cminorgenproof.v` in CompCert v3.8, there was an old
-  lemma stating that next block is not changed by the operation
-  `free_list`:
+- (Lines 522-525) One main difference is that next blocks are replaced
+  by supports along with the related properties. For instance, in
+  [`cfrontend/Cminorgenproof.v`](CompCert-3.8/cfrontend/Cminorgenproof.v)
+  in CompCert v3.8, there was an old lemma stating that next block is
+  not changed by the operation `free_list`:
 
   ```
   Lemma nextblock_freelist:
@@ -160,7 +171,9 @@ very big and listed as follows:
     Mem.nextblock m' = Mem.nextblock m.
   ```
 
-  It is generalized to the following theorem about support:
+  It is generalized to the following theorem about support in
+  [`cfrontend/Cminorgenproof.v`](Nominal-CompCert/cfrontend/Cminorgenproof.v)
+  in Nominal CompCert:
 
   ```
   Lemma support_freelist:
@@ -172,17 +185,19 @@ very big and listed as follows:
   There exists many other small changes with the same nature; we
   elide a discussion of them.
 
-- The changes to valid blocks discussed at lines 526-532 is
-  demonstrated in `backend/Inliningproof.v`. Previously, the
-  invariant `match_stacks_cons` assumes:
+- (Lines 526-532) The changes to valid blocks is demonstrated in
+  [`backend/Inliningproof.v`](Nominal-CompCert/backend/Inliningproof.v). Previously,
+  the invariant `match_stacks_cons` in [CompCert
+  v3.8](CompCert-3.8/backend/Inliningproof.v) assumes:
 
   ```
   (BELOW: Plt sp' bound)
   ```
 
-  which guarantees that `sp'` is a valid block.  In Nominal CompCert,
-  the next block `bound` is changed to `support` and the above
-  proposition is broken into two:
+  which guarantees that `sp'` is a valid block.  In [Nominal
+  CompCert](Nominal-CompCert/backend/Inliningproof.v), the next block
+  `bound` is changed to `support` and the above proposition is broken
+  into two:
 
   ```
   (SPS': sp' = fresh_block sps')
@@ -192,8 +207,10 @@ very big and listed as follows:
 
   We elide a discussion of similar changes.
 
-- The proofs are updated accordingly with the above changes. The final
-  theorem (Theorem 3.1) is proved in `driver/Compiler.v` as follows:
+- (Theorem 3.1) The proofs are updated accordingly with the above
+  changes. The final correctness theorem is proved in
+  [`driver/Compiler.v`](Nominal-CompCert/driver/Compiler.v) as
+  follows:
 
   ```
   Theorem transf_c_program_correct:
@@ -214,19 +231,22 @@ This instantiation of nominal memory model is introduced in Section
 4.1. Its constituents are described as follows:
 
 - (Section 4.1.1) `fid`, `path` and the module `Block` are defined in
-  `common/Values.v`.
+  [`common/Values.v`](Nominal-CompCert-Struct-Memspace/common/Values.v).
 
-- (Section 4.1.2) `stree` is defined in `common/Memory.v`, together
-  with its operations `next_stree`, `next_block_stree`,
+- (Section 4.1.2) `stree` is defined in
+  [`common/Memory.v`](Nominal-CompCert-Struct-Memspace/common/Memory.v),
+  together with its operations `next_stree`, `next_block_stree`,
   `return_stree` and `stree_in` and their properties. A well-founded
   induction principle `stree_ind` is also established for induction
   over strees.
 
-- (Section 4.1.3) The formalization of support, i.e., module `Sup`,
-  is defined in `common/Memory.v`. 
+- (Section 4.1.3) The formalization of support, i.e., module `Sup`, is
+  defined in
+  [`common/Memory.v`](Nominal-CompCert-Struct-Memspace/common/Memory.v).
 
 - (Section 4.1.4) The memory operations `alloc_glob`, `alloc_frame`,
-  `return_frame` and `alloc_block` are defined in `common/Memory.v`.
+  `return_frame` and `alloc_block` are defined in 
+  [`common/Memory.v`](Nominal-CompCert-Struct-Memspace/common/Memory.v).
   Essential properties about these operations are also proved there.
 
 ### Nominal CompCert with structured memory space
@@ -235,12 +255,16 @@ This extension is introduced in Section 4.2. The updates to semantics
 of CompCert's languages are as follows:
 
 - (Lines 713-715) Originally, the allocation global variables in the
- function `alloc_global` in `common/Globalenvs.v` is done by using
- the `alloc` method. In this extension, `alloc_global` is used instead.
+ function `alloc_global` in
+ [`common/Globalenvs.v`](CompCert-3.8/common/Globalenvs.v) is done by
+ using the `alloc` method. In this extension, `alloc_glob` is used
+ instead in [this
+ extension](Nominal-CompCert-Struct-Memspace/common/Globalenvs.v) .
 
 - (Line 716) `alloc_frame` and `return_frame` are added to function
-  calls and returns. For example, in Cminor, the small-step
-  transition is changed from
+  calls and returns. For example, in Cminor, the small-step transition
+  is changed from [the original
+  definition](CompCert-3.8/backend/Cminor.v):
 
   ```
   Inductive step: state -> trace -> state -> Prop :=
@@ -258,18 +282,20 @@ of CompCert's languages are as follows:
   ...
   ```
 
-  to 
+  to [the new one](Nominal-CompCert-Struct-Memspace/backend/Cminor.v):
 
   ```
   Inductive step: state -> trace -> state -> Prop :=
   ...
   | step_return_0: forall f k sp e m m' m'',
     Mem.free m sp 0 f.(fn_stackspace) = Some m' ->
+    (* return_frame *)
     Mem.return_frame m' = Some m'' ->
     step (State f (Sreturn None) k (Vptr sp Ptrofs.zero) e m)
       E0 (Returnstate Vundef (call_cont k) m'')
   ...
   | step_internal_function: forall f vargs k m m' m'' sp e path id,
+    (* alloc_frame *)
     Mem.alloc_frame m id = (m', path) ->
     Mem.alloc m' 0 f.(fn_stackspace) = (m'', sp) ->
     set_locals f.(fn_vars) (set_params vargs f.(fn_params)) = e ->
@@ -282,9 +308,10 @@ of CompCert's languages are as follows:
   implementation as `alloc_block`. Therefore, we have reused the
   `alloc` method for allocation of stack blocks.
 
-- With the above changes, we are able to update the complete proofs
-  of CompCert, the final correctness theorem is again found at
-  `transf_c_program_correct` in `driver/Compiler.v`.
+- (Line 720-723) With the above changes, we are able to update the
+  complete proofs of CompCert, the final correctness theorem is again
+  found at `transf_c_program_correct` in
+  [`driver/Compiler.v`](Nominal-CompCert-Struct-Memspace/driver/Compiler.v).
 
 ### Intuitive proofs for partial memory transformation
 
