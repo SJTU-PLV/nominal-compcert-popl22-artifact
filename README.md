@@ -374,5 +374,251 @@ very big and listed as follows:
 
 ## Extension 3: Stack-Aware Nominal CompCert
 
+  This extension is implemented in the directory
+  `Stack-Aware-Nominal-CompCert` and correspond to the contents in
+  Section 5.2. 
+
+  - (Definition 5.1) The abstract stack is defined in
+    `common/Memory.v`. In particular, the section `STACKADT` contains
+    the following formalization of Definition 5.1:
+
+    ```
+    Record frame : Type :=
+    {
+      frame_size : Z;
+      frame_size_pos: (0 <= frame_size)%Z;
+    }.
+    
+    Definition stage := list frame.
+    Definition stackadt := list stage.
+    ```
+    
+  - (Line 901) The function `stack_size` calculates the size of an abstract
+    stack by adding all the sizes of its frames together, as follows:
+    
+    ```
+    Fixpoint stack_size (s:stackadt): Z :=
+      match s with
+      |nil => 0
+      |hd::tl => size_of_all_frames hd + stack_size tl
+      end.
+    ```
+    
+    Note that this is an over-approximation of the size consumption
+    when a stage contains multiple frames allocated by a sequences of
+    tail calls because only the top-most tail call is alive.
+
+    Necessary properties about this function are also proved.
+
+  - (Line 902) The maximal stack size is defined as the following constant:
+
+    ```
+    Definition max_stacksize : Z := 4096.
+    ```
+
+  - (Lines 902-905)The new support has the following type
+    
+    ```
+    Record sup' : Type := mksup {
+      stack : stree;
+      astack : stackadt;
+      global : list ident;
+    }.
+    ```
+
+  - (Lines 906-915) The functions for manipuating the abstract stack,
+    including `push_stage`, `record_frame` (i.e., `record` in the
+    paper) and `pop_stage` are defined in `common/Memory.v`, together
+    with a collection of properties about them.
+ 
+  - (Lines 916-921) To prove semantics preservation, we updated the
+    semantics of each language with operations over abstract stack
+    using the `stackspace` oracle. We take `cfrontend/Clight.v` as an
+    example:
+
+    + The following parameter denotes the oracle `stackspace` in the paper:
+
+      ```
+      Variable fn_stack_requirements : ident -> Z.
+      ```
+
+    + On function entry, a new stage is created and a frame is
+      recorded whose size is determined by the oracle. For example, we
+      have
+      
+      ```
+      Inductive function_entry1 (ge: genv) (f: function) (vargs: list val) (m: mem) (e: env) (le: temp_env) (m': mem) (id:ident) : Prop :=
+      | function_entry1_intro: forall m0 m1 m2 path,
+        ...
+        (* push_stage and record_frame *)
+        Mem.record_frame (Mem.push_stage m1) (Memory.mk_frame (fn_stack_requirements id )) = Some m2 ->
+        ...
+      ```
+
+    + On function return, the top-most stage is popped. For example, we have
+
+      ```
+      Inductive step: state -> trace -> state -> Prop :=
+      ...
+      | step_return_0: forall f k e le m m' m'' m''',
+        Mem.free_list m (blocks_of_env e) = Some m' ->
+        Mem.return_frame m' = Some m'' ->
+        (* pop_stage *)
+        Mem.pop_stage m'' = Some m''' ->
+        step (State f (Sreturn None) k e le m) 
+             E0 (Returnstate Vundef (call_cont k) m''')
+      ...
+      ```
+
+    + The semantics preservation theorems now use the updated semantics
+      and depend on the oracle. For example, the simulation thoerem in
+      `cfronend/SimplLocalsproof.v` is stated as follows:
+
+      ```
+      Theorem transf_program_correct:
+        forward_simulation (semantics1 fn_stack_requirements prog)
+                           (semantics2 fn_stack_requirements tprog).
+      ```
+
+  - (Lines 922-930) The new proofs for inlining and tailcall relies on
+    two semantics for RTL that caculates stack consumption in
+    two different ways: 
+    
+    + In `backend/RTL.v`, a regular call pushes a new stage while a
+      tailcall does not. When an internal function is entered, a new
+      frame is recorded on the top-most stage. Since `stack_size`
+      caculates the stack size by adding up the sizes of frames, the
+      stack size consumptions incurred by regular calls and tail calls
+      to the same function are the same. This matches with the
+      description in Fig. 8 and is formalized in the following
+      definition of the small-step transition:
+    
+      ```
+      Inductive step: state -> trace -> state -> Prop :=
+      ...
+      | exec_Icall:
+          forall s f sp pc rs m sig ros args res pc' fd id,
+          ...
+          (* push_stage *)
+          step (State s f sp pc rs m)
+               E0 (Callstate (Stackframe res f sp pc' rs :: s) fd rs##args (Mem.push_stage m) id)
+      | exec_Itailcall:
+        forall s f stk pc rs m sig ros args fd m' m'' id,
+          ...
+          (* No push_stage *)
+          step (State s f (Vptr stk Ptrofs.zero) pc rs m)
+               E0 (Callstate s fd rs##args m'' id)
+      | exec_function_internal:
+        forall s f args m m' m'' stk id path m''',
+          ...
+          (* record_frame *)
+          Mem.record_frame m'' (Memory.mk_frame (fn_stack_requirements id)) = Some m''' ->
+          step (Callstate s (Internal f) args m id)
+               E0 (State s f (Vptr stk Ptrofs.zero) f.(fn_entrypoint)
+                   (init_regs args f.(fn_params)) m''')
+      | exec_return:
+        forall res f sp pc rs s vres m m',
+          (* pop_stage *)
+          Mem.pop_stage m = Some m' ->
+          step (Returnstate (Stackframe res f sp pc rs :: s) vres m)
+               E0 (State s f sp pc (rs#res <- vres) m').
+      ...
+      ```
+
+    + In `backend/RTLmach.v`, the `push_stage` and `record_frame` are
+      merged and only happen when entering an internal
+      function. Moreover, the top-most stage is popped upon a
+      tailcall. As a result, the abstrat stack now matches with the
+      call stack, such that each of its stage contains only one frame
+      corresponding to an actiation record. Moreover, the result of
+      applying `stack_size` on this abstract stack is the actual stack
+      consumption at the machine level (hence the name
+      `RTLmach`). This is formalized in the definition of the
+      small-step transition, as follows:
+
+      ```
+      Inductive step: state -> trace -> state -> Prop :=
+      ...
+      | exec_Icall:
+        forall s f sp pc rs m sig ros args res pc' fd id,
+        ...
+        (* No operation on the abstract stack *)
+        step (State s f sp pc rs m)
+             E0 (Callstate (Stackframe res f sp pc' rs :: s) fd rs##args m id)
+      | exec_Itailcall:
+        forall s f stk pc rs m sig ros args fd m' id m'' m''',
+        ...
+        (* pop_stage *)
+        Mem.pop_stage m'' = Some m''' ->
+        step (State s f (Vptr stk Ptrofs.zero) pc rs m)
+             E0 (Callstate s fd rs##args m''' id)
+      | exec_function_internal:
+        forall s f args m m' m'' m''' stk id path,
+        ...
+        (* push_stage and record_frame *)
+        Mem.record_frame (Mem.push_stage m'')(Memory.mk_frame (fn_stack_requirements id)) = Some m''' ->
+        step (Callstate s (Internal f) args m id)
+             E0 (State s f (Vptr stk Ptrofs.zero) f.(fn_entrypoint)
+                 (init_regs args f.(fn_params)) m''')
+      | exec_Ireturn:
+        forall s f stk pc rs m or m' m'' m''',
+        ...
+        (* pop_stage *)
+        Mem.pop_stage m'' = Some m''' ->
+        step (State s f (Vptr stk Ptrofs.zero) pc rs m)
+             E0 (Returnstate s (regmap_optget or Vundef rs) m''')
+      ...
+      ```      
+
+    + We define an identity transformation at the RTL level in
+      `backend/RTLmachproof.v`:
+
+      ```
+      Definition transf_program (p: program) : program := p.
+      ```
+
+      We then prove the forward simulation between the above two
+      semantics over the same RTL program in `backend/RTLmachproof.v`:
+
+      ```
+      Theorem transf_program_correct:
+        forward_simulation (RTL.semantics fn_stack_requirements prog)
+                           (RTLmach.semantics fn_stack_requirements tprog).
+      ```
+
+      We insert the identity transformation into the compilation chain
+      after `Inlining` in `driver/Compiler.v` and use the above
+      simulation theorem to prove its correctness.
+
+      ```
+      Definition transf_rtl_program (f: RTL.program) : res Asm.program :=
+      OK f
+      @@ print (print_RTL 0)
+      @@ total_if Compopts.optim_tailcalls (time "Tail calls" Tailcall.transf_program)
+      @@ print (print_RTL 1)
+      @@@ time "Inlining" Inlining.transf_program
+      @@ time "RTLmach" RTLmachproof.transf_program
+      ...
+      ```
+  - (Theorem 5.2) The final correctness theorem is defined in `driver/Compiler.v`, as follows:
+
+    ```
+    Theorem transf_c_program_correct_real: forall p tp,
+      transf_c_program_real p = OK tp ->
+      backward_simulation (Csem.semantics (fn_stack_requirements tp) p) (RealAsm.semantics tp).
+    ```
+
+    Note that the oracle `stackspace` is extracted from the target
+    program `tp` by calling `fn_stack_requirements` which is defined
+    as follows:
+
+    ```
+    Definition fn_stack_requirements (tp: Asm.program) (id: ident) : Z :=
+       match Globalenvs.Genv.find_funct_ptr (Globalenvs.Genv.globalenv tp) (Values.Global id) with
+       | Some (Internal f) => Asm.fn_stacksize f
+       | _ => 0
+       end.
+    ```
+
 
 ## Extension 4: Multi-Stack CompCert
