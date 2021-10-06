@@ -601,6 +601,26 @@ Section 5.2.
     @@ time "RTLmach" RTLmachproof.transf_program
     ...
     ```
+
+- The assembly language `Asm` is complied into `RealAsm` by following
+  the same psses in Stack-Aware CompCert (see [1]). We have
+  implemented and proved these passes for the x86 backend.
+
+  + An alternative x86 assembly semantics (called `Single-Stack Asm`)
+    that makes use of a single and contiguous stack is defined in
+    `x86/SSAsm.v`. Note that `Single-Stack Asm` still uses pseudo
+    registers and instructions like `Asm`. The forward simulation
+    between `Asm` semantics and `Single-Stack Asm` is proved in
+    `x86/SSAsmproof.v`. This proof makes critical use of abstract
+    stack to merge the individual stack frames into a single and
+    contiguous stack.
+
+  + A third x86 semantics (called `RealAsm`) is defined
+    `x86/RealAsm.v`. `RealAsm` no longer relies on pseudo registers or
+    instructions. The forward simulation between `Single-Stack Asm`
+    and `RealAsm` is proved in `x86/RealAsmproof.v`. This proof is
+    almost identical to the one in Stack-Aware CompCert.
+
 - (Theorem 5.2) The final correctness theorem is defined in `driver/Compiler.v`, as follows:
 
   ```
@@ -627,4 +647,65 @@ Section 5.2.
 This extension is implemented in the directory `Multi-Stack-CompCert`
 and correspond to the contents in Section 5.3 and 5.4.
 
-- 
+- (Lines 944-950) The definition of supports (in `common/Memory.v`) is
+  generalized to contain multiple stack trees and abstract stacks:
+
+  ```
+  Record sup' : Type := mksup {
+    stacks : list stree;
+    astacks : list stackadt;
+    global : list ident;
+  
+    sid : nat;
+    sid_valid : (length stacks > sid)%nat;
+    length_eq : length stacks = length astacks
+  }.
+  ```
+  
+  Here, `sid` denotes the index to the stack being focused on in the
+  fields `stacks` and `astacks`. 
+
+- (Lines 952-953) The following functions are used to access the focused stack:
+
+  ```
+  Definition stack (s:sup) := nth (sid s) (stacks s) empty_stree.
+  Definition astack (s:sup) := nth (sid s)(astacks s) nil.
+  ```
+
+- (Lines 954-962) The proofs of Stack-Aware Nominal CompCert are
+  updated straightforwardly by using the above definitions. The final
+  theorem of Multi-Stack CompCert is located in `driver/Compiler.v`:
+
+  ```
+  Theorem transf_c_program_correct_real:
+  forall p tp,
+    transf_c_program_real p = OK tp ->
+    backward_simulation (Csem.semantics (fn_stack_requirements tp) p) (RealAsm.semantics tp).
+  ```
+
+  It looks similar to that of Stack-Aware Nominal CompCert, except
+  that the semantics are updated with the usage of multiple stacks.
+
+- (Section 5.4.2) The thread-safe compilation is exactly the same as in
+  Multi-Stack CompCert. The thread-safe linking is part of the CCAL
+  framework which we do not include in this artifact. This is because
+  the newest implementation of CCAL is based on a very old version of
+  Coq (v8.4) which is not compatible with Coq v8.12 or CompCert
+  v3.8. However, since the key concept of thread-safe linking (i.e.,
+  linking of multiple stacks, see [2]) is readily provided by our
+  memory model with multiple and continguous stacks, its realization
+  is trivial once the CCAL framework is updated to Coq v8.12.
+
+
+## References 
+
+[1] *An Abstract Stack Based Approach to Verified Compositional
+    Compilation to Machine Code*. Yuting Wang, Pierre Wilke, and Zhong
+    Shao. The 46th ACM SIGPLAN Symposium on Principles of Programming
+    Languages (POPL), 2019.
+
+[2] *Certified Concurrent Abstraction Layers*. Ronghui Gu, Zhong Shao,
+    Jieung Kim, Xiongnan (Newman) Wu, Jérémie Koenig, Vilhelm Sjöberg,
+    Hao Chen, David Costanzo, and Tahina Ramananandro. The 2018 ACM
+    SIGPLAN Conference on Programming Language Design and
+    Implementation (PLDI), 2018.
