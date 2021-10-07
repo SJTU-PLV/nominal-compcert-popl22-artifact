@@ -654,7 +654,7 @@ correspond to the contents in Section 5.2.
     that makes use of a single and contiguous stack is defined in
     [`x86/SSAsm.v`](Stack-Aware-Nominal-CompCert/x86/SSAsm.v). Note
     that `Single-Stack Asm` still uses pseudo registers and
-    instructions like `Asm`. The forward simulation between `Asm`
+    instructions like `Asm`. A forward simulation between `Asm`
     semantics and `Single-Stack Asm` is proved in
     [`x86/SSAsmproof.v`](Stack-Aware-Nominal-CompCert/x86/SSAsmproof.v). This
     proof makes critical use of abstract stack to merge the individual
@@ -662,7 +662,7 @@ correspond to the contents in Section 5.2.
 
   + A third x86 Asm semantics (i.e., `RealAsm`) is defined
     [`x86/RealAsm.v`](Stack-Aware-Nominal-CompCert/x86/RealAsm.v). `RealAsm`
-    no longer relies on pseudo registers or instructions. The backward
+    no longer relies on pseudo registers or instructions. A backward
     simulation between `Single-Stack Asm` and `RealAsm` is proved in
     [`x86/RealAsmproof.v`](Stack-Aware-Nominal-CompCert/x86/RealAsmproof.v). This
     proof is almost identical to the one in Stack-Aware CompCert.
