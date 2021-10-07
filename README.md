@@ -662,7 +662,7 @@ correspond to the contents in Section 5.2.
 
   + A third x86 Asm semantics (i.e., `RealAsm`) is defined
     [`x86/RealAsm.v`](Stack-Aware-Nominal-CompCert/x86/RealAsm.v). `RealAsm`
-    no longer relies on pseudo registers or instructions. The forward
+    no longer relies on pseudo registers or instructions. The backward
     simulation between `Single-Stack Asm` and `RealAsm` is proved in
     [`x86/RealAsmproof.v`](Stack-Aware-Nominal-CompCert/x86/RealAsmproof.v). This
     proof is almost identical to the one in Stack-Aware CompCert.
