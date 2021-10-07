@@ -84,6 +84,11 @@ The compilation should start and terminate successfully. Currently,
 the artifact only works for the x86 back-end because Stack-Awareness
 is only implemented for x86.
 
+For each extension, we have tested its compilation by running the
+command `make -j4` on the VM with 4GB virtual memory and 4 CPU
+cores. The VM in turn runs on a host machine with Intel i7-8550U and
+8GB memory. A single run takes about 15 minutes. 
+
 ### Navigating the proofs
 
 After that,
@@ -109,14 +114,20 @@ Then, the html versions of source code can be found at `doc/html`.
 
 ### Checking the test cases
 
-To check that our CompCert extensions work for compilation, you can
-run the test cases in the `test` directory, as follows:
+To check that our CompCert extensions work for compiling C programs,
+you can run the test cases in the `test` directory, as follows:
 
 ```
 make
 make test
 ```
 
+With the previous hardware setup, a single run takes about 2 minutes
+except for the "Interpreted tests" for Nominal CompCert which take
+about 15 minutes. This is because `fresh_block` in Nominal CompCert
+traverses the whole support and is invoked every time a new block is
+allocated. The interpretation of these invocations in Coq takes a
+long time.
 
 ## Extension 1: Nominal CompCert
 
