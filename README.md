@@ -439,7 +439,7 @@ correspond to the contents in Section 5.2.
   Definition stackadt := list stage.
   ```
   
-- (Line 901) The function `stack_size` calculates the size of an abstract
+- (Line 900) The function `stack_size` calculates the size of an abstract
   stack by adding all the sizes of its frames together, as follows:
   
   ```
@@ -456,7 +456,7 @@ correspond to the contents in Section 5.2.
 
   Some important properties about this function are also proved.
 
-- (Line 902) The maximal stack size is defined as the following constant:
+- (Line 901) The maximal stack size is defined as the following constant:
 
   ```
   Definition max_stacksize : Z := 4096.
@@ -688,7 +688,7 @@ correspond to the contents in Section 5.2.
     backward_simulation (Csem.semantics (fn_stack_requirements tp) p) (RealAsm.semantics tp).
   ```
 
-  Note that the oracle `stackspace` is extracted from the target
+  Note that the instance of the oracle `stackspace` is extracted from the target
   program `tp` by calling a concrete definition for
   `fn_stack_requirements`, as follows:
 
@@ -708,7 +708,7 @@ This extension is implemented in the directory
 contents in Section 5.3 and 5.4.
 
 - (Lines 944-950) The definition of supports (in
-  [`common/Memory.v`](Multi-Stack-CompCert/common/Memory.v) is
+  [`common/Memory.v`](Multi-Stack-CompCert/common/Memory.v)) is
   generalized to contain multiple stack trees and abstract stacks:
 
   ```
