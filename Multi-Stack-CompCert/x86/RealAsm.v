@@ -812,8 +812,17 @@ Definition m_state s :=
       apply Genv.init_mem_sid in H0 as SID.
       constructor.
       - red.
-        simpl; unfold rs0; simpl_regs; simpl. eexists. split. reflexivity.
-        apply align_Mptr_stack_limit.
+        simpl; unfold rs0; simpl_regs. eexists. split. reflexivity.
+        apply div_ptr_add.
+        apply div_unsigned_repr.
+        apply Z.divide_add_r. apply align_Mptr_stack_limit. apply align_Mptr_align8.
+        apply align_Mptr_modulus. unfold Ptrofs.neg. apply div_unsigned_repr.
+        apply Zdivide_opp_r.
+        apply div_unsigned_repr.
+        apply align_size_chunk_divides.
+        apply align_Mptr_modulus.
+        apply align_Mptr_modulus.
+        apply align_Mptr_modulus.
       - exploit Mem.alloc_result; eauto. intro. subst.
         unfold Mem.nextblock in H1. unfold Mem.fresh_block in H1.
         rewrite STK in H1. destr_in H1. simpl in Heqp. inv Heqp.

@@ -626,7 +626,7 @@ Lemma mk_storebyte_eq:
   exists ti, mk_storebyte x x0 nil = OK ti /\ tc = ti ++ c.
 Proof.
   unfold mk_storebyte.
-  intros. inv EQ1. repeat (destr; eauto).
+  intros. repeat (destr; eauto); inv EQ1; eauto.
 Qed.
 
 

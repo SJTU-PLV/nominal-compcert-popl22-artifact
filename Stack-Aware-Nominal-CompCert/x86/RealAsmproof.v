@@ -905,8 +905,8 @@ Require Import Linking.
         symmetry.  apply Val.load_result_same.
         revert RA_NOT_VUNDEF. unfold Val.load_result, Mptr, Tptr.
         destruct ptr64 eqn:PTR.
-        destruct (rs1 RA); simpl; try congruence. auto.
-        destruct (rs1 RA); simpl; try congruence.
+        destruct (rs1 RA); simpl; try congruence; auto.
+        destruct (rs1 RA); simpl; try congruence; auto.
         eapply Mem.load_type in LOADRA.
         change Tptr with (type_of_chunk Mptr). auto.
       } destruct H as (RA1 & RA1U & RATYP); subst.

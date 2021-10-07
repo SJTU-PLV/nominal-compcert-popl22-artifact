@@ -957,8 +957,7 @@ Proof.
              | H: OK _ = OK _ |- _ => inv H
              | H: Error _ = OK _ |- _ => inv H
              | |- _ => simpl in *; eauto
-             end.
-  unfold mk_intconv. destr.
+             end; try (unfold mk_intconv; destr; eauto).
   unfold mk_shrxlimm. destr; eauto.
   unfold mk_shrxlimm. destr; eauto.
   repeat destr; eauto.
@@ -983,7 +982,7 @@ Lemma mk_storebyte_eq:
   exists ti, mk_storebyte x x0 nil = OK ti /\ tc = ti ++ c.
 Proof.
   unfold mk_storebyte.
-  intros. inv EQ1. repeat (destr; eauto).
+  intros. repeat (destr; eauto); inv EQ1; eauto.
 Qed.
 
 
@@ -1014,7 +1013,7 @@ Lemma mk_storebyte_eq':
     mk_storebyte x x0 (c ++ c') = OK (tc ++ c').
 Proof.
   unfold mk_storebyte.
-  intros. inv EQ1. repeat (destr; eauto).
+  intros. repeat (destr; eauto); inv EQ1; eauto.
 Qed.
 
 Lemma transl_store_eq':
