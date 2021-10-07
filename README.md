@@ -62,7 +62,7 @@ compile.
 - If you are using the VM, you are set. All the required software have
 already been installed on the virtual machine. 
 
-- If you prefer to compiled the source code on your own computer, then
+- If you prefer to compile the source code on your own computer, then
 we suggest you install the prerequisites via
 [opam](https://opam.ocaml.org/) and follow the standard installation
 steps in [the user's manual of
@@ -223,7 +223,7 @@ very big and listed as follows:
 
 This extension is implemented in the directory
 [`Nominal-CompCert-Struct-Memspace`](Nominal-CompCert-Struct-Memspace)
-and correspond to the contents in Section 4 and 5.1.
+and corresponds to the contents in Section 4 and 5.1.
 
 ### Nominal memory model with structured space
 
@@ -740,12 +740,12 @@ contents in Section 5.3 and 5.4.
 - (Section 5.4.2) The thread-safe compilation is exactly the same as
   in Multi-Stack CompCert. The thread-safe linking is part of the CCAL
   framework which we do not include in this artifact. This is because
-  the newest implementation of CCAL is based on a very old version of
+  the newest implementation of CCAL is based on an older version of
   Coq (v8.4) which is not compatible with Coq v8.12 or CompCert
   v3.8. However, since the key concept of thread-safe linking (i.e.,
   linking of multiple stacks, see [2]) is fully supported by our
   memory model with multiple and contiguous stacks, its realization
-  is trivial once the CCAL framework is updated to Coq v8.12.
+  is straightforward once the CCAL framework is updated to Coq v8.12.
 
 
 ## References 
