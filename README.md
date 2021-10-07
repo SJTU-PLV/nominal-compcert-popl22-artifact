@@ -708,7 +708,7 @@ This extension is implemented in the directory
 contents in Section 5.3 and 5.4.
 
 - (Lines 944-950) The definition of supports (in
-  [`common/Memory.v`](Multi-Stack-CompCert/common/Memory.v) is
+  [`common/Memory.v`](Multi-Stack-CompCert/common/Memory.v)) is
   generalized to contain multiple stack trees and abstract stacks:
 
   ```
