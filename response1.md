@@ -1,6 +1,6 @@
 First and foremost, we don't think there is a password for sudo. Could the reviewer check it again and let us know if there is any problem with sudo?
 
-The following are instructions for reproducing the results of Table 1 and 2. Note that we continued to work on this artifact after we submitted the paper. Therefore, some results are slightly different from those in the paper (specifically, the 'Stack-Aware Nominal CompCert').
+The following are instructions for reproducing the results of Table 1 and 2. Note that we continued to work on this artifact after we submitted the paper. Therefore, some results are slightly different from those in the paper.
 
 All the commands in the following instructions should be executed under the directory 'nominal-compcert-popl22-artifact'.
 
