@@ -1,50 +1,66 @@
-Firstly, since we have been working on this artifact after the paper submission, the results reproduced on codes here are slightly different from those in the paper.
+First and foremost, we don't think there is a password for sudo. Could the reviewer check it again and let us know if there is any problem with sudo?
 
-All the mentioned commands here should be executed in path 'nominal-compcert-popl22-artifact'.
-### Table1
-The results in the first column can be produced by:
+The following are instructions for reproducing the results of Table 1 and 2. Note that we continued to work on this artifact after we submitted the paper. Therefore, some results are slightly different from those in the paper (specifically, the 'Stack-Aware Nominal CompCert').
+
+All the commands in the following instructions should be executed under the directory 'nominal-compcert-popl22-artifact'.
+
+## Table 1
+
+### Column 2
+The results in the second column can be produced by running:
+
 ```
 coqwc CompCert-3.8/common/Values.v CompCert-3.8/common/Memory.v CompCert-3.8/common/Memtype.v CompCert-3.8/common/Globalenvs.v CompCert-3.8/cfrontend/SimplLocalsproof.v CompCert-3.8/cfrontend/Cminorgenproof.v CompCert-3.8/backend/Inliningproof.v  CompCert-3.8/backend/ValueAnalysis.v CompCert-3.8/backend/Unusedglobproof.v
 ```
-This command will list the 'spec', 'proof' and 'comments' lines of code(LOC) of the files appear in the Table1 seperately. Adding the 'spec' and 'proof' columns will give the results in column1.
-In addition, row 'Total' in Table1 is the summary of the LOCs of all coq files(.v) instead of the listed ones, which can be printed by running:
+
+This command lists the lines of code (LOC) for files in CompCert 3.8 that also appear in the Table 1 in three categories: 'spec', 'proof' and 'comments'. The numbers in column 2 are obtained by adding the numbers in 'spec' and 'proof' for each file. 
+
+The number at the row 'Total' is the summation of LOC for all coq files(.v). It is obtained by running:
 ```
 coqwc CompCert-3.8/*/*.v
 ```
-The command will print the LOCs for all the .v files in the 'Compcert-3.8' path and the total number **in the last row of output**. Similarly adding the 'spec' and 'proof'(i.e. the first two numbers in the last line) will give the result in row 'Total', column1.
+and adding the numbers in the 'spec' and 'proof' categories in the last line.
 
-For column2, similarly copy and run:
+### Column 3
+The numbers in column 3 can be obtained in a similar way. Run the following command:
 ```
 coqwc Nominal-CompCert/common/Values.v Nominal-CompCert/common/Memory.v Nominal-CompCert/common/Memtype.v Nominal-CompCert/common/Globalenvs.v Nominal-CompCert/cfrontend/SimplLocalsproof.v Nominal-CompCert/cfrontend/Cminorgenproof.v Nominal-CompCert/backend/Inliningproof.v  Nominal-CompCert/backend/ValueAnalysis.v Nominal-CompCert/backend/Unusedglobproof.v
 ```
-Adding the numbers in column 'spec' and 'proof' will give the results in the column2. For the result in row 'Total', run
+and add the numbers in 'spec' and 'proof' to get the results in column 2. For the result at the row 'Total', run
 ```
 coqwc Nominal-CompCert/*/*.v
 ```
-and add the first two numbers **in the last row of output**.
+and add the numbers in 'spec' and 'proof' in the last line.
 
-The results in the third column was manually collected from the [github compare page](https://github.com/SJTU-PLV/CompCert/compare/478ece4...e9c10d5). The numbers are around the larger ones of additions and deletions(lines of code) of the files, the differences come from empty lines. The last column is simply the ratio of the column3 and column1.
+### Column 4
+The results in the fourth column was manually collected from the [github compare page](https://github.com/SJTU-PLV/CompCert/compare/478ece4...e9c10d5). For each file, the number is the bigger one among "additions" and "deletions", with the number of empty lines subtracted. 
 
-### Table 2
-In Table2, we list the lines of 'spec' and 'proof' code separately instead of the sum of them. For the first and the third columns(`Nominal-CompCert` version), copy and run:
+### Column 5
+The last column contains the ratios of the numbers in column 4 to those in column 2.
+
+
+## Table 2
+
+In Table 2, we list the LOC for 'spec' and 'proof' separately. For the second and fourth columns(`Nominal-CompCert`), run:
 ```
 coqwc Nominal-CompCert/common/Memory.v Nominal-CompCert/common/Globalenvs.v Nominal-CompCert/common/Events.v Nominal-CompCert/common/Separation.v Nominal-CompCert/cfrontend/SimplLocalsproof.v Nominal-CompCert/cfrontend/Cminorgenproof.v Nominal-CompCert/backend/Tailcallproof.v  Nominal-CompCert/backend/Inliningproof.v  Nominal-CompCert/backend/ValueAnalysis.v Nominal-CompCert/backend/Stackingproof.v
 ```
-The first two columns of the output ('spec' and 'proof') respectively correspond to column1 and column3 in Table2. The `RTLmach.v` and `RTLmachproof.v` are omitted here because the compilation pass form `RTL` to `RTLmach` was added in the `Stack-Aware-Nominal-CompCert` version.
-For the 'Total' line, run again:
+The results in the 'spec' and 'proof' categories correspond to column 2 and column 4 in Table 2, respectively. The `RTLmach.v` and `RTLmachproof.v` are omitted here because the compilation pass form `RTL` to `RTLmach` was only added to `Stack-Aware-Nominal-CompCert`.
+
+For the row 'Total', run:
 ```
 coqwc Nominal-CompCert/*/*.v
 ```
-The first two numbers **in the last row of the output** are the results in row 'Total', column1 and column3 in Table2.
+Again, the first two numbers in the last line correspond to the results at row 'Total' in column 2 and column 4.
 
-For the second and fourth columns(`Stack-Aware-Nominal-CompCert` version), copy and run:
+For the third and fifth columns(`Stack-Aware-Nominal-CompCert`), run:
 ```
 coqwc Stack-Aware-Nominal-CompCert/common/Memory.v Stack-Aware-Nominal-CompCert/common/Globalenvs.v Stack-Aware-Nominal-CompCert/common/Events.v Stack-Aware-Nominal-CompCert/common/Separation.v Stack-Aware-Nominal-CompCert/backend/RTLmach.v Stack-Aware-Nominal-CompCert/backend/RTLmachproof.v Stack-Aware-Nominal-CompCert/cfrontend/SimplLocalsproof.v Stack-Aware-Nominal-CompCert/cfrontend/Cminorgenproof.v Stack-Aware-Nominal-CompCert/backend/Tailcallproof.v  Stack-Aware-Nominal-CompCert/backend/Inliningproof.v  Stack-Aware-Nominal-CompCert/backend/ValueAnalysis.v Stack-Aware-Nominal-CompCert/backend/Stackingproof.v
 ```
-The first two columns of the output ('spec' and 'proof') respectively correspond to column2 and column4 in Table2. For the 'Total' line, run:
+The 'spec' and 'proof' categories of the output correspond to column 3 and column 5. The numbers are higher because we continued working on Stack-Aware Nominal CompCert for a while after submission.
+
+The numbers at the row 'Total' in column 3 and 5 are obtained like before, by running:
 ```
 coqwc Stack-Aware-Nominal-CompCert/*/*.v
 ```
-The first two numbers **in the last row of the output** correspond to the results in row 'Total', column1 and column3 in Table2.
-### sudo password
-There is no need to enter a password to run sudo in the virtual machine.
+
