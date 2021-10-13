@@ -1,6 +1,6 @@
 First and foremost, we don't think there is a password for sudo. Could the reviewer check it again and let us know if there is any problem with sudo?
 
-The following are instructions for reproducing the results of Table 1 and 2. Note that we continued to work on this artifact after we submitted the paper. Therefore, some results are slightly different from those in the paper.
+The following are the instructions for reproducing the results in Table 1 and 2. Note that we continued to work on this artifact after we submitted the paper. Therefore, some results are slightly different from those in the paper.
 
 All the commands in the following instructions should be executed under the directory 'nominal-compcert-popl22-artifact'.
 
@@ -26,14 +26,14 @@ The numbers in column 3 can be obtained in a similar way. Run the following comm
 ```
 coqwc Nominal-CompCert/common/Values.v Nominal-CompCert/common/Memory.v Nominal-CompCert/common/Memtype.v Nominal-CompCert/common/Globalenvs.v Nominal-CompCert/cfrontend/SimplLocalsproof.v Nominal-CompCert/cfrontend/Cminorgenproof.v Nominal-CompCert/backend/Inliningproof.v  Nominal-CompCert/backend/ValueAnalysis.v Nominal-CompCert/backend/Unusedglobproof.v
 ```
-and add the numbers in 'spec' and 'proof' to get the results in column 2. For the result at the row 'Total', run
+and add the numbers in 'spec' and 'proof' to get the results in column 3. For the result at the row 'Total', run
 ```
 coqwc Nominal-CompCert/*/*.v
 ```
 and add the numbers in 'spec' and 'proof' in the last line.
 
 ### Column 4
-The results in the fourth column was manually collected from the [github compare page](https://github.com/SJTU-PLV/CompCert/compare/478ece4...e9c10d5). For each file, the number is the bigger one among "additions" and "deletions", with the number of empty lines subtracted. 
+The results in the fourth column were manually collected from the [github compare page](https://github.com/SJTU-PLV/CompCert/compare/478ece4...e9c10d5). For each file, the number is the bigger one among "additions" and "deletions", with the number of empty lines subtracted. 
 
 ### Column 5
 The last column contains the ratios of the numbers in column 4 to those in column 2.
@@ -45,7 +45,7 @@ In Table 2, we list the LOC for 'spec' and 'proof' separately. For the second an
 ```
 coqwc Nominal-CompCert/common/Memory.v Nominal-CompCert/common/Globalenvs.v Nominal-CompCert/common/Events.v Nominal-CompCert/common/Separation.v Nominal-CompCert/cfrontend/SimplLocalsproof.v Nominal-CompCert/cfrontend/Cminorgenproof.v Nominal-CompCert/backend/Tailcallproof.v  Nominal-CompCert/backend/Inliningproof.v  Nominal-CompCert/backend/ValueAnalysis.v Nominal-CompCert/backend/Stackingproof.v
 ```
-The results in the 'spec' and 'proof' categories correspond to column 2 and column 4 in Table 2, respectively. The `RTLmach.v` and `RTLmachproof.v` are omitted here because the compilation pass form `RTL` to `RTLmach` was only added to `Stack-Aware-Nominal-CompCert`.
+The results in the 'spec' and 'proof' categories correspond to column 2 and column 4, respectively. The `RTLmach.v` and `RTLmachproof.v` are omitted here because the compilation pass form `RTL` to `RTLmach` was only added to `Stack-Aware-Nominal-CompCert`.
 
 For the row 'Total', run:
 ```
@@ -63,4 +63,3 @@ The numbers at the row 'Total' in column 3 and 5 are obtained like before, by ru
 ```
 coqwc Stack-Aware-Nominal-CompCert/*/*.v
 ```
-
