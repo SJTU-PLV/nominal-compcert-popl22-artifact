@@ -15,7 +15,7 @@
 Require Import Coqlib Errors.
 Require Import Integers Floats AST Linking.
 Require Import Values Memory Events Globalenvs Smallstep.
-Require Import Op Locations Mach Conventions Asm AsmFacts.
+Require Import Op Locations Mach Conventions Asm.
 Require Import Asmgen Asmgenproof0 Asmgenproof1.
 
 Definition match_prog (p: Mach.program) (tp: Asm.program) :=
@@ -631,7 +631,26 @@ Proof.
   exists (l++instr::nil). rewrite H. rewrite app_ass. simpl. auto.
 Qed.
 
+Lemma preg_of_not_rsp:
+  forall m x,
+    preg_of m = x ->
+    x <> RSP.
+Proof.
+  unfold preg_of. intros; subst.
+  destruct m; congruence.
+Qed.
 
+Lemma ireg_of_not_rsp:
+  forall m x,
+    Asmgen.ireg_of m = Errors.OK x ->
+    IR x <> RSP.
+Proof.
+  unfold Asmgen.ireg_of.
+  intros m x A.
+  destr_in A. inv A.
+  eapply preg_of_not_rsp in Heqp.
+  intro; subst. congruence.
+Qed.
 (** This is the simulation diagram.  We prove it by case analysis on the Mach transition. *)
 
 Theorem step_simulation:
@@ -854,7 +873,7 @@ Opaque loadind.
   eapply functions_transl; eauto. eapply find_instr_tail; eauto.
   simpl. rewrite nextinstr_inv. 2: congruence.
   setoid_rewrite Pregmap.gso. 2: congruence.
-  setoid_rewrite Pregmap.gso. 2: eapply ireg_of_not_rsp; eauto. rewrite H10.
+  setoid_rewrite Pregmap.gso.  2: eapply ireg_of_not_rsp; eauto. rewrite H10.
   exploit functions_translated. apply FFPcalled. intros (tf1 & FPPcalled' & TF).
   simpl. rewrite pred_dec_true by auto. rewrite FPPcalled'.
   eauto. traceEq.
@@ -1226,7 +1245,7 @@ Proof.
   eexact transf_final_states.
   exact step_simulation.
 Qed.
-
+(*
 Theorem transf_program_unchange_rsp:
   (forall b, Genv.find_funct_ptr ge b = None -> Genv.find_funct_ptr tge b = None) ->
   asm_prog_unchange_rsp tge.
@@ -1245,6 +1264,6 @@ Proof.
   split. apply asm_builtin_unchange_rsp_valid.
   apply asm_external_unchange_rsp_valid.
 Qed.
-
+*)
 End PRESERVATION.
 
