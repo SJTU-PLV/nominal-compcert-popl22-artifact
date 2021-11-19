@@ -142,14 +142,14 @@ and correspond to the contents in Section 3 of the paper.
 The nominal memory model is introduced Section 3.2. Its constituents
 are listed as follows:
 
-- (Lines 442-445) The interface for nominal block ids `BLOCK` is
-  defined in [`common/Values.v`](Nominal-CompCert/common/Values.v) as `Module Type BLOCK`.
+- (Lines 442-445) The interface for nominal block ids `BLOCK` is defined by the Coq module type
+  `Block` in [`common/Values.v`](Nominal-CompCert/common/Values.v).
 
 - (Lines 491-493) The instantiation of `BLOCK` with positive ids is defined by the Coq
   module `Block` in [`common/Values.v`](Nominal-CompCert/common/Values.v).
 
-- (Lines 447-458) The interface for supports `SUP` is defined in
-  [`common/Memtype.v`](Nominal-CompCert/common/Memtype.v) as `Module Type SUP`.
+- (Lines 447-458) The interface for supports `SUP` is defined by the module type `SUP` in
+  [`common/Memtype.v`](Nominal-CompCert/common/Memtype.v).
 
 - (Lines 495-499) The instantiation of supports as a list of block ids is defined by
   the module `Sup` in [`common/Memory.v`](Nominal-CompCert/common/Memory.v).
@@ -237,8 +237,8 @@ As described in Section 3.4, there is *zero immediate overhead* to introduce
 instantiations of block ids and supports. One can provide different implementations
 for `Module Block` in  [`common/Values.v`](Nominal-CompCert/common/Values.v) and
 `Module Sup` in [`common/Memory.v`](Nominal-CompCert/common/Memory.v). As long as these
-implementations satisfy the corresponding interfaces
-(`Module Block <: BLOCK` and `Module Sup <: SUP`), the entire proof of Nominal CompCert holds.
+implementations satisfy the corresponding interfaces (`Module Block <: BLOCK` and
+`Module Sup <: SUP`), the entire proof of Nominal CompCert still holds.
 
 
 ## Extension 2: Nominal CompCert with Structured Memory Space
@@ -406,8 +406,12 @@ in
   touch stack at all. With this very precise invariant, we know that
   at any point of regular execution, the stack frames are not changed
   at all. As a result, the proof becomes much more intuitive.
-  
-[//]:add sth about simple and intuitive here.
+
+  Note that we do not claim our proof is simpler than before because the
+  new proof is still built on top of the old one. To get a simpler proof,
+  we will need to rewrite the whole proof from scratch. This is left for
+  future work. The same observation can be made for the other compiler passes
+  mentioned in Sec 2.4.1, including SimplLocals, Cminorgen and Stacking.
 
   Similar observations can be made for other passes. For example, in
   [`SimplLocalsproof.v`](Nominal-CompCert-Struct-Memspace/cfrontend/SimplLocalsproof.v),
@@ -772,76 +776,89 @@ contents in Section 5.3 and 5.4.
   is straightforward once the CCAL framework is updated to Coq v8.12.
 
 ## Evaluation
-    The following are the instructions for reproducing the lines of code (LOC) in Table 1 and 2. All the commands in the following instructions should be executed under the directory 'nominal-compcert-popl22-artifact'.
+
+The following are the instructions for reproducing the lines of code (LOC) in
+Table 1 and 2. All the commands in the following instructions should be executed
+under the directory 'nominal-compcert-popl22-artifact'.
 
 ### Table 1
+
 #### Column 2
+
 The results in the second column can be produced by running:
 ```
     coqwc CompCert-3.8/common/Memory.v CompCert-3.8/common/Memtype.v CompCert-3.8/common/Globalenvs.v CompCert-3.8/cfrontend/SimplLocalsproof.v CompCert-3.8/cfrontend/Cminorgenproof.v CompCert-3.8/backend/Inliningproof.v  CompCert-3.8/backend/ValueAnalysis.v CompCert-3.8/backend/Unusedglobproof.v
 ```
-This command lists the lines of code (LOC) for files in CompCert 3.8 that also appear in the Table 1 in three categories: 'spec', 'proof' and 'comments'. The numbers in column 2 are obtained by adding the numbers in 'spec' and 'proof' for each file.
+This command lists the lines of code (LOC) for files in CompCert 3.8 that also
+appear in the Table 1 in three categories: 'spec', 'proof' and 'comments'. The
+numbers in column 2 are obtained by adding the numbers in 'spec' and 'proof' for each file.
 
-The number at the row 'Total' is the summation of LOC for all coq files(.v). It is obtained by running:
+The number at the row 'Total' is the summation of LOC for all coq files(.v).
+It is obtained by running:
 ```
-coqwc CompCert-3.8/*/*.v
+    coqwc CompCert-3.8/*/*.v
 ```
 and adding the numbers in the 'spec' and 'proof' categories in the last line.
 
 #### Column 3
 The numbers in column 3 can be obtained in a similar way. Run the following command:
 ```
-coqwc Nominal-CompCert/common/Memory.v Nominal-CompCert/common/Memtype.v Nominal-CompCert/common/Globalenvs.v Nominal-CompCert/cfrontend/SimplLocalsproof.v Nominal-CompCert/cfrontend/Cminorgenproof.v Nominal-CompCert/backend/Inliningproof.v  Nominal-CompCert/backend/ValueAnalysis.v Nominal-CompCert/backend/Unusedglobproof.v
+    coqwc Nominal-CompCert/common/Memory.v Nominal-CompCert/common/Memtype.v Nominal-CompCert/common/Globalenvs.v Nominal-CompCert/cfrontend/SimplLocalsproof.v Nominal-CompCert/cfrontend/Cminorgenproof.v Nominal-CompCert/backend/Inliningproof.v  Nominal-CompCert/backend/ValueAnalysis.v Nominal-CompCert/backend/Unusedglobproof.v
 ```
-and add the numbers in 'spec' and 'proof' to get the results in column 3. For the result at the row 'Total', run
+and add the numbers in 'spec' and 'proof' to get the results in column 3.
+For the result at the row 'Total', run
 ```
-coqwc Nominal-CompCert/*/*.v
-
+    coqwc Nominal-CompCert/*/*.v
 ```
 and add the numbers in 'spec' and 'proof' in the last line.
 
-#### Column 4
-The results in the fourth column were manually collected from the [github compare page](https://github.com/SJTU-PLV/CompCert/compare/478ece4...e9c10d5). For each file, the number is the bigger one among "additions" and "deletions", with the number of empty lines subtracted.
+#### Column 6
+The results in column 6 were manually collected from the
+[github compare page](https://github.com/SJTU-PLV/CompCert/compare/478ece4...7fe44a1).
+For each file, the number is the bigger one among "additions" and "deletions",
+with the number of empty lines subtracted.
 
 ### Table 2
 
 #### Column 2
-Similar to the Table 1, the results can be produced by running
+Similar to the Table 1, the results in column 2 can be produced by running
 ```
-coqwc Nominal-CompCert/common/Memory.v Nominal-CompCert/common/Globalenvs.v Nominal-CompCert/cfrontend/SimplLocalsproof.v Nominal-CompCert/cfrontend/Cminorgenproof.v  Nominal-CompCert/backend/Unusedglobproof.v Nominal-CompCert/backend/Stackingproof.v
+    coqwc Nominal-CompCert/common/Memory.v Nominal-CompCert/common/Globalenvs.v Nominal-CompCert/cfrontend/SimplLocalsproof.v Nominal-CompCert/cfrontend/Cminorgenproof.v Nominal-CompCert/backend/Unusedglobproof.v Nominal-CompCert/backend/Stackingproof.v
 ```
-and add the numbers in 'spec' and 'proof' for each file. For the result at the row 'Total'. run
+and add the numbers in 'spec' and 'proof' for each file.
+
+For the result at the row 'Total', run
 ```
-coqwc Nominal-CompCert/*/*.v
+    coqwc Nominal-CompCert/*/*.v
 ```
 and add the numbers in 'spec' and 'proof' in the last line.
 
 #### Column 3
 For seperate files, run
 ```
-coqwc Nominal-CompCert-Struct-Memspace/common/Memory.v Nominal-CompCert-Struct-Memspace/common/Globalenvs.v Nominal-CompCert-Struct-Memspace/cfrontend/SimplLocalsproof.v Nominal-CompCert-Struct-Memspace/cfrontend/Cminorgenproof.v  Nominal-CompCert-Struct-Memspace/backend/Unusedglobproof.v Nominal-CompCert-Struct-Memspace/backend/Stackingproof.v
+    coqwc Nominal-CompCert-Struct-Memspace/common/Memory.v Nominal-CompCert-Struct-Memspace/common/Globalenvs.v Nominal-CompCert-Struct-Memspace/cfrontend/SimplLocalsproof.v Nominal-CompCert-Struct-Memspace/cfrontend/Cminorgenproof.v  Nominal-CompCert-Struct-Memspace/backend/Unusedglobproof.v Nominal-CompCert-Struct-Memspace/backend/Stackingproof.v
 ```
-For Total result, run
+For 'Total' result, run
 ```
-coqwc Nominal-CompCert-Struct-Memspace/*/*.v
+    coqwc Nominal-CompCert-Struct-Memspace/*/*.v
 ```
 #### Column 6
 For seperate files, run
 ```
-coqwc Stack-Aware-Nominal-CompCert/common/Memory.v Stack-Aware-Nominal-CompCert/common/Globalenvs.v Stack-Aware-Nominal-CompCert/cfrontend/SimplLocalsproof.v Stack-Aware-Nominal-CompCert/cfrontend/Cminorgenproof.v  Stack-Aware-Nominal-CompCert/backend/Unusedglobproof.v Stack-Aware-Nominal-CompCert/backend/Stackingproof.v
+    coqwc Stack-Aware-Nominal-CompCert/common/Memory.v Stack-Aware-Nominal-CompCert/common/Globalenvs.v Stack-Aware-Nominal-CompCert/cfrontend/SimplLocalsproof.v Stack-Aware-Nominal-CompCert/cfrontend/Cminorgenproof.v  Stack-Aware-Nominal-CompCert/backend/Unusedglobproof.v Stack-Aware-Nominal-CompCert/backend/Stackingproof.v
 ```
-For Total result, run
+For 'Total' result, run
 ```
-coqwc Stack-Aware-CompCert/*/*.v
+    coqwc Stack-Aware-Nominal-CompCert/*/*.v
 ```
 #### Column 9
 For seperate files, run
 ```
-coqwc Multi-Stack-CompCert/common/Memory.v Multi-Stack-CompCert/common/Globalenvs.v Multi-Stack-CompCert/cfrontend/SimplLocalsproof.v Multi-Stack-CompCert/cfrontend/Cminorgenproof.v  Multi-Stack-CompCert/backend/Unusedglobproof.v Multi-Stack-CompCert/backend/Stackingproof.v
+    coqwc Multi-Stack-CompCert/common/Memory.v Multi-Stack-CompCert/common/Globalenvs.v Multi-Stack-CompCert/cfrontend/SimplLocalsproof.v Multi-Stack-CompCert/cfrontend/Cminorgenproof.v  Multi-Stack-CompCert/backend/Unusedglobproof.v Multi-Stack-CompCert/backend/Stackingproof.v
 ```
-For Total result, run
+For 'Total' result, run
 ```
-coqwc Multi-Stack-CompCert/*/*.v
+    coqwc Multi-Stack-CompCert/*/*.v
 ```
 ## References
 
