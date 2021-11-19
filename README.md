@@ -57,10 +57,10 @@ We shall delve into the details of these extensions later.
 ### Prerequisites
 
 This artifact is based on CompCert v3.8 and needs Coq v8.12 to
-compile. 
+compile.
 
 - If you are using the VM, you are set. All the required software have
-already been installed on the virtual machine. 
+already been installed on the virtual machine.
 
 - If you prefer to compile the source code on your own computer, then
 we suggest you install the prerequisites via
@@ -87,7 +87,7 @@ is only implemented for x86.
 For each extension, we have tested its compilation by running the
 command `make -j4` on the VM with 4GB virtual memory and 4 CPU
 cores. The VM in turn runs on a host machine with Intel i7-8550U and
-8GB memory. A single run takes about 15 minutes. 
+8GB memory. A single run takes about 15 minutes.
 
 ### Navigating the proofs
 
@@ -142,23 +142,24 @@ and correspond to the contents in Section 3 of the paper.
 The nominal memory model is introduced Section 3.2. Its constituents
 are listed as follows:
 
-- (Lines 459-464) The interface for nominal block ids `BLOCK` is
-  defined in [`common/Values.v`](Nominal-CompCert/common/Values.v).
+- (Lines 442-445) The interface for nominal block ids `BLOCK` is
+  defined in [`common/Values.v`](Nominal-CompCert/common/Values.v) as `Module Type BLOCK`.
 
-- (Lines 509-511) The instantiation of `BLOCK` with positive ids is defined by the Coq
+- (Lines 491-493) The instantiation of `BLOCK` with positive ids is defined by the Coq
   module `Block` in [`common/Values.v`](Nominal-CompCert/common/Values.v).
 
-- (Lines 466- 483) The interface for supports `SUP` is defined in
-  [`common/Memtype.v`](Nominal-CompCert/common/Memtype.v).
+- (Lines 447-458) The interface for supports `SUP` is defined in
+  [`common/Memtype.v`](Nominal-CompCert/common/Memtype.v) as `Module Type SUP`.
 
-- (Lines 512-516) The instantiation of supports as a list of block ids is defined by
+- (Lines 495-499) The instantiation of supports as a list of block ids is defined by
   the module `Sup` in [`common/Memory.v`](Nominal-CompCert/common/Memory.v).
 
-- (Lines 496-506) The updated memory state `mem` is defined in
+- (Lines 525-535) The updated memory state `mem` is defined in
   [`common/Memory.v`](Nominal-CompCert/common/Memory.v) with a new
   field `support:sup`.  The updated definition of `valid_block` can
   also be found in this file. The basic properties of the memory model
   have been reproved with these changes.
+
 
 ### Nominal CompCert
 
@@ -169,7 +170,7 @@ have discussed above, the changes w.r.t. CompCert are mainly about the
 semantics of languages and updates of proofs. These changes are not
 very big and listed as follows:
 
-- (Lines 522-525) One main difference is that next blocks are replaced
+- (Lines 542-545) One main difference is that next blocks are replaced
   by supports along with the related properties. For instance, in
   [`cfrontend/Cminorgenproof.v`](CompCert-3.8/cfrontend/Cminorgenproof.v)
   in CompCert v3.8, there was an old lemma stating that next block is
@@ -196,7 +197,7 @@ very big and listed as follows:
   There exists many other small changes with the same nature; we
   elide a discussion of them.
 
-- (Lines 526-532) The changes to valid blocks is demonstrated in
+- (Lines 546-552) The changes to valid blocks is demonstrated in
   [`backend/Inliningproof.v`](Nominal-CompCert/backend/Inliningproof.v). Previously,
   the invariant `match_stacks_cons` in [CompCert
   v3.8](CompCert-3.8/backend/Inliningproof.v) assumes:
@@ -230,6 +231,16 @@ very big and listed as follows:
     backward_simulation (Csem.semantics p) (Asm.semantics tp).
   ```
 
+### Instantiation of Nominal CompCert
+
+As described in Section 3.4, there is *zero immediate overhead* to introduce
+instantiations of block ids and supports. One can provide different implementations
+for `Module Block` in  [`common/Values.v`](Nominal-CompCert/common/Values.v) and
+`Module Sup` in [`common/Memory.v`](Nominal-CompCert/common/Memory.v). As long as these
+implementations satisfy the corresponding interfaces
+(`Module Block <: BLOCK` and `Module Sup <: SUP`), the entire proof of Nominal CompCert holds.
+
+
 ## Extension 2: Nominal CompCert with Structured Memory Space
 
 This extension is implemented in the directory
@@ -239,40 +250,40 @@ and corresponds to the contents in Section 4 and 5.1.
 ### Nominal memory model with structured space
 
 This instantiation of nominal memory model is introduced in Section
-4.1. Its constituents are described as follows:
+4.2. Its constituents are described as follows:
 
-- (Section 4.1.1) `fid`, `path` and the module `Block` are defined in
+- (Section 4.2.1) `fid`, `path` and the module `Block` are defined in
   [`common/Values.v`](Nominal-CompCert-Struct-Memspace/common/Values.v).
 
-- (Section 4.1.2) `stree` is defined in
+- (Section 4.2.2) `stree` is defined in
   [`common/Memory.v`](Nominal-CompCert-Struct-Memspace/common/Memory.v),
   together with its operations `next_stree`, `next_block_stree`,
   `return_stree` and `stree_in` and their properties. A well-founded
   induction principle `stree_ind` is also established for induction
   over strees.
 
-- (Section 4.1.3) The formalization of support, i.e., module `Sup`, is
+- (Section 4.2.3) The formalization of support, i.e., module `Sup`, is
   defined in
   [`common/Memory.v`](Nominal-CompCert-Struct-Memspace/common/Memory.v).
 
-- (Section 4.1.4) The memory operations `alloc_glob`, `alloc_frame`,
-  `return_frame` and `alloc_block` are defined in 
+- (Section 4.2.4) The memory operations `alloc_glob`, `alloc_frame`,
+  `return_frame` and `alloc_block` are defined in
   [`common/Memory.v`](Nominal-CompCert-Struct-Memspace/common/Memory.v).
   Essential properties about these operations are also proved there.
 
 ### Nominal CompCert with structured memory space
 
-This extension is introduced in Section 4.2. The updates to semantics
+This extension is introduced in Section 4.3. The updates to semantics
 of CompCert's languages are as follows:
 
-- (Lines 713-715) Originally, the allocation global variables in the
+- (Lines 828-830) Originally, the allocation global variables in the
  function `alloc_global` in
  [`common/Globalenvs.v`](CompCert-3.8/common/Globalenvs.v) is done by
  using the `alloc` method. In this extension, `alloc_glob` is used
  instead in [this
  extension](Nominal-CompCert-Struct-Memspace/common/Globalenvs.v) .
 
-- (Line 716) `alloc_frame` and `return_frame` are added to function
+- (Line 831) `alloc_frame` and `return_frame` are added to function
   calls and returns. For example, in Cminor, the small-step transition
   is changed from [the original
   definition](CompCert-3.8/backend/Cminor.v):
@@ -315,18 +326,18 @@ of CompCert's languages are as follows:
   ...
   ```
 
-- (Line 717) In our artifact, `alloc` is updated to have the same
+- (Line 832) In our artifact, `alloc` is updated to have the same
   implementation as `alloc_block`. Therefore, we have reused the
   `alloc` method for allocation of stack blocks.
 
-- (Line 720-723) With the above changes, we are able to update the
+- (Line 841-847) With the above changes, we are able to update the
   complete proofs of CompCert, the final correctness theorem is again
   found at `transf_c_program_correct` in
   [`driver/Compiler.v`](Nominal-CompCert-Struct-Memspace/driver/Compiler.v).
 
 ### Intuitive proofs for partial memory transformation
 
-This corresponds to the discussion in Section 4.3. We have updated
+This corresponds to the discussion in Section 4.4. We have updated
 the proofs for `SimplLocals`, `Cminorgen`, `Unusedglob` and
 `Stacking` to use structural memory injections. They are formalized
 in 
@@ -335,10 +346,10 @@ in
 [`backend/Unusedglobproof.v`](Nominal-CompCert-Struct-Memspace/backend/Unusedglobproof.v) and 
 [`backend/Stackingproof.v`](Nominal-CompCert-Struct-Memspace/backend/Stackingproof.v).
 
-- (Section 4.3.1) For each pass, its structural memory injection is
+- (Section 4.4.1) For each pass, its structural memory injection is
   defined as the function `struct_meminj`. The implementation of
   `struct_meminj` varies for different passes. For example,
-  `struct_meminj` for `Unusedglobal` (lines 764-769) is defined in
+  `struct_meminj` for `Unusedglobal` (lines 834-839) is defined in
   [`backend/Unusedglobproof.v`](Nominal-CompCert-Struct-Memspace/backend/Unusedglobproof.v) 
   as follows:
  
@@ -356,7 +367,7 @@ in
     fun b => if check_block s b then Some (b,0) else None.
   ```
 
-  and `struct_meminj` for `Cminorgen` (lines 804-810) is defined in
+  and `struct_meminj` for `Cminorgen` (lines 895-900) is defined in
   [`cfrontend/Cminorgenproof.v`](Nominal-CompCert-Struct-Memspace/cfrontend/Cminorgenproof.v)
    as follows:
 
@@ -377,7 +388,7 @@ in
              unchecked_meminj b else None.
   ```
 
-- (Section 4.3.2 and 4.3.3) With the structured memory injection, we
+- (Section 4.4.2 and 4.4.3) With the structured memory injection, we
   are able to simplify the reasoning about stack memory. For example,
   in
   [`Unusedglobproof.v`](Nominal-CompCert-Struct-Memspace/backend/Unusedglobproof.v),
@@ -391,10 +402,12 @@ in
 
   Here, `SMJ` asserts that the injection is a structural one, while
   `MSTK` asserts that the stack tree is exactly the same before and
-  after the transformation (lines 799-800) as `Unusedglob` does not
+  after the transformation (lines 925-926) as `Unusedglob` does not
   touch stack at all. With this very precise invariant, we know that
   at any point of regular execution, the stack frames are not changed
   at all. As a result, the proof becomes much more intuitive.
+  
+[//]:add sth about simple and intuitive here.
 
   Similar observations can be made for other passes. For example, in
   [`SimplLocalsproof.v`](Nominal-CompCert-Struct-Memspace/cfrontend/SimplLocalsproof.v),
@@ -439,7 +452,7 @@ correspond to the contents in Section 5.2.
   Definition stackadt := list stage.
   ```
   
-- (Line 900) The function `stack_size` calculates the size of an abstract
+- (Line 1018) The function `stack_size` calculates the size of an abstract
   stack by adding all the sizes of its frames together, as follows:
   
   ```
@@ -456,13 +469,13 @@ correspond to the contents in Section 5.2.
 
   Some important properties about this function are also proved.
 
-- (Line 901) The maximal stack size is defined as the following constant:
+- (Line 1019) The maximal stack size is defined as the following constant:
 
   ```
   Definition max_stacksize : Z := 4096.
   ```
 
-- (Lines 902-905)The new support has the following type
+- (Lines 1020-1022) The new support has the following type
   
   ```
   Record sup' : Type := mksup {
@@ -472,13 +485,13 @@ correspond to the contents in Section 5.2.
   }.
   ```
 
-- (Lines 906-915) The functions for manipulating the abstract stack,
+- (Lines 1023-1040) The functions for manipulating the abstract stack,
   including `push_stage`, `record_frame` (i.e., `record` in the paper)
   and `pop_stage` are defined in
   [`common/Memory.v`](Stack-Aware-Nominal-CompCert/common/Memory.v),
   together with a collection of properties about them.
 
-- (Lines 916-921) To prove semantics preservation, we updated the
+- (Lines 1041-1050) To prove semantics preservation, we updated the
   semantics of each language with operations over abstract stack using
   the `stackspace` oracle. We take
   [`cfrontend/Clight.v`](Stack-Aware-Nominal-CompCert/cfrontend/Clight.v)
@@ -513,7 +526,7 @@ correspond to the contents in Section 5.2.
       Mem.return_frame m' = Some m'' ->
       (* pop_stage *)
       Mem.pop_stage m'' = Some m''' ->
-      step (State f (Sreturn None) k e le m) 
+      step (State f (Sreturn None) k e le m)
            E0 (Returnstate Vundef (call_cont k) m''')
     ...
     ```
@@ -529,7 +542,7 @@ correspond to the contents in Section 5.2.
                          (semantics2 fn_stack_requirements tprog).
     ```
 
-- (Lines 922-930) The new semantics preservation proofs rely on two
+- (Lines 1051-1060) The new semantics preservation proofs rely on two
   semantics for RTL that calculates stack consumption in two different
   ways:
   
@@ -707,7 +720,7 @@ This extension is implemented in the directory
 [`Multi-Stack-CompCert`](Multi-Stack-CompCert) and correspond to the
 contents in Section 5.3 and 5.4.
 
-- (Lines 944-950) The definition of supports (in
+- (Lines 1092-1095) The definition of supports (in
   [`common/Memory.v`](Multi-Stack-CompCert/common/Memory.v)) is
   generalized to contain multiple stack trees and abstract stacks:
 
@@ -726,14 +739,14 @@ contents in Section 5.3 and 5.4.
   Here, `sid` denotes the index to the stack being focused on in the
   fields `stacks` and `astacks`. 
 
-- (Lines 952-953) The following functions are used to access the focused stack:
+- (Lines 1096-1098) The following functions are used to access the focused stack:
 
   ```
   Definition stack (s:sup) := nth (sid s) (stacks s) empty_stree.
   Definition astack (s:sup) := nth (sid s)(astacks s) nil.
   ```
 
-- (Lines 954-962) The proofs of Stack-Aware Nominal CompCert are
+- (Lines 1099-1107) The proofs of Stack-Aware Nominal CompCert are
   updated straightforwardly by using the above definitions. The final
   theorem of Multi-Stack CompCert is located in
   [`driver/Compiler.v`](Multi-Stack-CompCert/driver/Compiler.v):
@@ -758,8 +771,79 @@ contents in Section 5.3 and 5.4.
   memory model with multiple and contiguous stacks, its realization
   is straightforward once the CCAL framework is updated to Coq v8.12.
 
+## Evaluation
+    The following are the instructions for reproducing the lines of code (LOC) in Table 1 and 2. All the commands in the following instructions should be executed under the directory 'nominal-compcert-popl22-artifact'.
 
-## References 
+### Table 1
+#### Column 2
+The results in the second column can be produced by running:
+```
+    coqwc CompCert-3.8/common/Memory.v CompCert-3.8/common/Memtype.v CompCert-3.8/common/Globalenvs.v CompCert-3.8/cfrontend/SimplLocalsproof.v CompCert-3.8/cfrontend/Cminorgenproof.v CompCert-3.8/backend/Inliningproof.v  CompCert-3.8/backend/ValueAnalysis.v CompCert-3.8/backend/Unusedglobproof.v
+```
+This command lists the lines of code (LOC) for files in CompCert 3.8 that also appear in the Table 1 in three categories: 'spec', 'proof' and 'comments'. The numbers in column 2 are obtained by adding the numbers in 'spec' and 'proof' for each file.
+
+The number at the row 'Total' is the summation of LOC for all coq files(.v). It is obtained by running:
+```
+coqwc CompCert-3.8/*/*.v
+```
+and adding the numbers in the 'spec' and 'proof' categories in the last line.
+
+#### Column 3
+The numbers in column 3 can be obtained in a similar way. Run the following command:
+```
+coqwc Nominal-CompCert/common/Memory.v Nominal-CompCert/common/Memtype.v Nominal-CompCert/common/Globalenvs.v Nominal-CompCert/cfrontend/SimplLocalsproof.v Nominal-CompCert/cfrontend/Cminorgenproof.v Nominal-CompCert/backend/Inliningproof.v  Nominal-CompCert/backend/ValueAnalysis.v Nominal-CompCert/backend/Unusedglobproof.v
+```
+and add the numbers in 'spec' and 'proof' to get the results in column 3. For the result at the row 'Total', run
+```
+coqwc Nominal-CompCert/*/*.v
+
+```
+and add the numbers in 'spec' and 'proof' in the last line.
+
+#### Column 4
+The results in the fourth column were manually collected from the [github compare page](https://github.com/SJTU-PLV/CompCert/compare/478ece4...e9c10d5). For each file, the number is the bigger one among "additions" and "deletions", with the number of empty lines subtracted.
+
+### Table 2
+
+#### Column 2
+Similar to the Table 1, the results can be produced by running
+```
+coqwc Nominal-CompCert/common/Memory.v Nominal-CompCert/common/Globalenvs.v Nominal-CompCert/cfrontend/SimplLocalsproof.v Nominal-CompCert/cfrontend/Cminorgenproof.v  Nominal-CompCert/backend/Unusedglobproof.v Nominal-CompCert/backend/Stackingproof.v
+```
+and add the numbers in 'spec' and 'proof' for each file. For the result at the row 'Total'. run
+```
+coqwc Nominal-CompCert/*/*.v
+```
+and add the numbers in 'spec' and 'proof' in the last line.
+
+#### Column 3
+For seperate files, run
+```
+coqwc Nominal-CompCert-Struct-Memspace/common/Memory.v Nominal-CompCert-Struct-Memspace/common/Globalenvs.v Nominal-CompCert-Struct-Memspace/cfrontend/SimplLocalsproof.v Nominal-CompCert-Struct-Memspace/cfrontend/Cminorgenproof.v  Nominal-CompCert-Struct-Memspace/backend/Unusedglobproof.v Nominal-CompCert-Struct-Memspace/backend/Stackingproof.v
+```
+For Total result, run
+```
+coqwc Nominal-CompCert-Struct-Memspace/*/*.v
+```
+#### Column 6
+For seperate files, run
+```
+coqwc Stack-Aware-Nominal-CompCert/common/Memory.v Stack-Aware-Nominal-CompCert/common/Globalenvs.v Stack-Aware-Nominal-CompCert/cfrontend/SimplLocalsproof.v Stack-Aware-Nominal-CompCert/cfrontend/Cminorgenproof.v  Stack-Aware-Nominal-CompCert/backend/Unusedglobproof.v Stack-Aware-Nominal-CompCert/backend/Stackingproof.v
+```
+For Total result, run
+```
+coqwc Stack-Aware-CompCert/*/*.v
+```
+#### Column 9
+For seperate files, run
+```
+coqwc Multi-Stack-CompCert/common/Memory.v Multi-Stack-CompCert/common/Globalenvs.v Multi-Stack-CompCert/cfrontend/SimplLocalsproof.v Multi-Stack-CompCert/cfrontend/Cminorgenproof.v  Multi-Stack-CompCert/backend/Unusedglobproof.v Multi-Stack-CompCert/backend/Stackingproof.v
+```
+For Total result, run
+```
+coqwc Multi-Stack-CompCert/*/*.v
+```
+## References
 
 [1] *An Abstract Stack Based Approach to Verified Compositional
     Compilation to Machine Code*. Yuting Wang, Pierre Wilke, and Zhong
