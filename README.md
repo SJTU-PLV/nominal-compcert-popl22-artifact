@@ -143,7 +143,7 @@ The nominal memory model is introduced Section 3.2. Its constituents
 are listed as follows:
 
 - (Lines 442-445) The interface for nominal block ids `BLOCK` is defined by the Coq module type
-  `Block` in [`common/Values.v`](Nominal-CompCert/common/Values.v).
+  `BLOCK` in [`common/Values.v`](Nominal-CompCert/common/Values.v).
 
 - (Lines 491-493) The instantiation of `BLOCK` with positive ids is defined by the Coq
   module `Block` in [`common/Values.v`](Nominal-CompCert/common/Values.v).
