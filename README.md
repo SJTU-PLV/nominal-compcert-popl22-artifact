@@ -635,7 +635,7 @@ correspond to the contents in Section 5.2.
       step (State s f (Vptr stk Ptrofs.zero) pc rs m)
            E0 (Returnstate s (regmap_optget or Vundef rs) m''')
     ...
-    ```      
+    ```
 
   + We define an identity transformation at the RTL level in
     [`backend/RTLmachproof.v`](Stack-Aware-Nominal-CompCert/backend/RTLmachproof.v):
@@ -670,38 +670,14 @@ correspond to the contents in Section 5.2.
     ...
     ```
 
-- The verified compilation chain of vanilla CompCert ends at assmebly languages.
-  In this extension, the assembly language
-  [`Asm`](Stack-Aware-Nominal-CompCert/x86/Asm.v) is complied into
-  [`RealAsm`](Stack-Aware-Nominal-CompCert/x86/RealAsm.v) by following
-  the same passes in Stack-Aware CompCert (see [1]). We have
-  implemented and proved these passes for the x86 backend.
-
-  + An alternative x86 assembly semantics (called `Single-Stack Asm`)
-    that makes use of a single and contiguous stack is defined in
-    [`x86/SSAsm.v`](Stack-Aware-Nominal-CompCert/x86/SSAsm.v). Note
-    that `Single-Stack Asm` still uses pseudo registers and
-    instructions like `Asm`. A forward simulation between `Asm`
-    semantics and `Single-Stack Asm` is proved in
-    [`x86/SSAsmproof.v`](Stack-Aware-Nominal-CompCert/x86/SSAsmproof.v). This
-    proof makes critical use of abstract stack to merge the individual
-    stack frames into a single and contiguous stack.
-
-  + A third x86 Asm semantics (i.e., `RealAsm`) is defined
-    [`x86/RealAsm.v`](Stack-Aware-Nominal-CompCert/x86/RealAsm.v). `RealAsm`
-    no longer relies on pseudo registers or instructions. A backward
-    simulation between `Single-Stack Asm` and `RealAsm` is proved in
-    [`x86/RealAsmproof.v`](Stack-Aware-Nominal-CompCert/x86/RealAsmproof.v). This
-    proof is almost identical to the one in Stack-Aware CompCert.
-
 - (Theorem 5.2) The final correctness theorem is defined in
   [`driver/Compiler.v`](Stack-Aware-Nominal-CompCert/driver/Compiler.v),
   as follows:
 
   ```
-  Theorem transf_c_program_correct_real: forall p tp,
-    transf_c_program_real p = OK tp ->
-    backward_simulation (Csem.semantics (fn_stack_requirements tp) p) (RealAsm.semantics tp).
+  Theorem transf_c_program_correct: forall p tp,
+    transf_c_program p = OK tp ->
+    backward_simulation (Csem.semantics (fn_stack_requirements tp) p) (Asm.semantics tp).
   ```
 
   Note that the instance of the oracle `stackspace` is extracted from the target
@@ -732,22 +708,47 @@ contents in Section 5.3 and 5.4.
     stacks : list stree;
     astacks : list stackadt;
     global : list ident;
-  
+
     sid : nat;
     sid_valid : (length stacks > sid)%nat;
     length_eq : length stacks = length astacks
   }.
   ```
-  
+
   Here, `sid` denotes the index to the stack being focused on in the
-  fields `stacks` and `astacks`. 
+  fields `stacks` and `astacks`.
 
 - (Lines 1096-1098) The following functions are used to access the focused stack:
 
   ```
   Definition stack (s:sup) := nth (sid s) (stacks s) empty_stree.
   Definition astack (s:sup) := nth (sid s)(astacks s) nil.
-  ```
+```
+
+- (Lines 1089-1092) The verified compilation chain of vanilla CompCert ends at assmebly languages.
+  In this extension, the assembly language
+  [`Asm`](Multi-Stack-CompCert/x86/Asm.v) is complied into
+  [`RealAsm`](Multi-Stack-CompCert/x86/RealAsm.v) by following
+  the same passes in Stack-Aware CompCert (see [1]). We have
+  implemented and proved these passes for the x86 backend.
+
+  + An alternative x86 assembly semantics (called `Single-Stack Asm`)
+    that makes use of a single and contiguous stack is defined in
+    [`x86/SSAsm.v`](Multi-Stack-CompCert/x86/SSAsm.v). Note
+    that `Single-Stack Asm` still uses pseudo registers and
+    instructions like `Asm`. A forward simulation between `Asm`
+    semantics and `Single-Stack Asm` is proved in
+    [`x86/SSAsmproof.v`](Multi-Stack-CompCert/x86/SSAsmproof.v). This
+    proof makes critical use of abstract stack to merge the individual
+    stack frames into a single and contiguous stack.
+
+  + A third x86 Asm semantics (i.e., `RealAsm`) is defined
+    [`x86/RealAsm.v`](Multi-Stack-CompCert/x86/RealAsm.v). `RealAsm`
+    no longer relies on pseudo registers or instructions. A backward
+    simulation between `Single-Stack Asm` and `RealAsm` is proved in
+    [`x86/RealAsmproof.v`](Multi-Stack-CompCert/x86/RealAsmproof.v). This
+    proof is almost identical to the one in Stack-Aware CompCert.
+
 
 - (Lines 1099-1107) The proofs of Stack-Aware Nominal CompCert are
   updated straightforwardly by using the above definitions. The final
@@ -762,7 +763,8 @@ contents in Section 5.3 and 5.4.
   ```
 
   It looks similar to that of Stack-Aware Nominal CompCert, except
-  that the semantics are updated with the usage of multiple stacks.
+  that the semantics are updated with the usage of multiple stacks
+  and the compilation chain is extended.
 
 - (Section 5.4.2) The thread-safe compilation is exactly the same as
   in Multi-Stack CompCert. The thread-safe linking is part of the CCAL
