@@ -407,12 +407,6 @@ in
   at any point of regular execution, the stack frames are not changed
   at all. As a result, the proof becomes much more intuitive.
 
-  Note that we do not claim our proof is simpler than before because the
-  new proof is still built on top of the old one. To get a simpler proof,
-  we will need to rewrite the whole proof from scratch. This is left for
-  future work. The same observation can be made for the other compiler passes
-  mentioned in Sec 2.4.1, including SimplLocals, Cminorgen and Stacking.
-
   Similar observations can be made for other passes. For example, in
   [`SimplLocalsproof.v`](Nominal-CompCert-Struct-Memspace/cfrontend/SimplLocalsproof.v),
   we have the following new invariants:
@@ -425,6 +419,12 @@ in
   where `Mem.stackseq` holds if the stack trees have the same
   structure. This help us convert reasoning about the whole stack
   memory into that for individual stack frames.
+
+  Note that we do not claim our proof is simpler than before because the
+  new proof is still built on top of the old one. To get a simpler proof,
+  we will need to rewrite the whole proof from scratch. This is left for
+  future work. The same observation can be made for the other compiler passes
+  mentioned in Sec 2.4.1, including SimplLocals, Cminorgen and Stacking.
 
 ### Verified compilation of programs with contextual memory
 
