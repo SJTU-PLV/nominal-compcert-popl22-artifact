@@ -16,7 +16,7 @@ v3.8 for comparison and reference). The artifact accompanies the
 following paper:
 
 > [*Verified Compilation of C Programs with a Nominal Memory
-  Model*](paper/popl22ae-paper26.pdf). Yuting Wang, Ling Zhang, Zhong
+  Model*](paper/nominalcompcert.pdf). Yuting Wang, Ling Zhang, Zhong
   Shao and Jeremie Koenig
 
 As described in the paper, these extensions are developed
