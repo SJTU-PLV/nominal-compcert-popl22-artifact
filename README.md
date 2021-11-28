@@ -721,17 +721,7 @@ contents in Section 5.3 and 5.4.
     no longer relies on pseudo registers or instructions. A backward
     simulation between `Single-Stack Asm` and `RealAsm` is proved in
     [`x86/RealAsmproof.v`](Multi-Stack-CompCert/x86/RealAsmproof.v). This
-    proof is almost identical to the one in CompCertMC.
-
-  The final correctness theorem is defined in
-  [`driver/Compiler.v`](Multi-Stack-CompCert/driver/Compiler.v),
-  as follows:
-
-  ```
-  Theorem transf_c_program_correct_real: forall p tp,
-    transf_c_program_real p = OK tp ->
-    backward_simulation (Csem.semantics (fn_stack_requirements tp) p) (RealAsm.semantics tp).
-  ```
+    proof is almost identical to the one in Stack-Aware CompCert.
 
 - (Lines 1092-1095) The definition of supports (in
   [`common/Memory.v`](Multi-Stack-CompCert/common/Memory.v)) is
