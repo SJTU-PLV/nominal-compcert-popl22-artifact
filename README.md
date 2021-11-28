@@ -723,7 +723,7 @@ contents in Section 5.3 and 5.4.
   ```
   Definition stack (s:sup) := nth (sid s) (stacks s) empty_stree.
   Definition astack (s:sup) := nth (sid s)(astacks s) nil.
-```
+  ```
 
 - (Lines 1089-1092) The verified compilation chain of vanilla CompCert ends at assmebly languages.
   In this extension, the assembly language
