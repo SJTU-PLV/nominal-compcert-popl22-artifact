@@ -423,8 +423,7 @@ in
   Note that we do not claim our proof is simpler than before because the
   new proof is still built on top of the old one. To get a simpler proof,
   we will need to rewrite the whole proof from scratch. This is left for
-  future work. The same observation can be made for the other compiler passes
-  mentioned in Sec 2.4.1, including SimplLocals, Cminorgen and Stacking.
+  future work. 
 
 ### Verified compilation of programs with contextual memory
 
