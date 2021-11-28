@@ -699,6 +699,30 @@ This extension is implemented in the directory
 [`Multi-Stack-CompCert`](Multi-Stack-CompCert) and correspond to the
 contents in Section 5.3 and 5.4.
 
+- (Lines 1089-1092) The verified compilation chain of vanilla CompCert ends at assmebly languages.
+  In this extension, the assembly language
+  [`Asm`](Multi-Stack-CompCert/x86/Asm.v) is complied into
+  [`RealAsm`](Multi-Stack-CompCert/x86/RealAsm.v) by following
+  the same passes in CompCertMC (see [1]). We have
+  implemented and proved these passes for the x86 backend.
+
+  + An alternative x86 assembly semantics (called `Single-Stack Asm`)
+    that makes use of a single and contiguous stack is defined in
+    [`x86/SSAsm.v`](Multi-Stack-CompCert/x86/SSAsm.v). Note
+    that `Single-Stack Asm` still uses pseudo registers and
+    instructions like `Asm`. A forward simulation between `Asm`
+    semantics and `Single-Stack Asm` is proved in
+    [`x86/SSAsmproof.v`](Multi-Stack-CompCert/x86/SSAsmproof.v). This
+    proof makes critical use of abstract stack to merge the individual
+    stack frames into a single and contiguous stack.
+
+  + A third x86 Asm semantics (i.e., `RealAsm`) is defined
+    [`x86/RealAsm.v`](Multi-Stack-CompCert/x86/RealAsm.v). `RealAsm`
+    no longer relies on pseudo registers or instructions. A backward
+    simulation between `Single-Stack Asm` and `RealAsm` is proved in
+    [`x86/RealAsmproof.v`](Multi-Stack-CompCert/x86/RealAsmproof.v). This
+    proof is almost identical to the one in Stack-Aware CompCert.
+
 - (Lines 1092-1095) The definition of supports (in
   [`common/Memory.v`](Multi-Stack-CompCert/common/Memory.v)) is
   generalized to contain multiple stack trees and abstract stacks:
@@ -724,31 +748,6 @@ contents in Section 5.3 and 5.4.
   Definition stack (s:sup) := nth (sid s) (stacks s) empty_stree.
   Definition astack (s:sup) := nth (sid s)(astacks s) nil.
   ```
-
-- (Lines 1089-1092) The verified compilation chain of vanilla CompCert ends at assmebly languages.
-  In this extension, the assembly language
-  [`Asm`](Multi-Stack-CompCert/x86/Asm.v) is complied into
-  [`RealAsm`](Multi-Stack-CompCert/x86/RealAsm.v) by following
-  the same passes in Stack-Aware CompCert (see [1]). We have
-  implemented and proved these passes for the x86 backend.
-
-  + An alternative x86 assembly semantics (called `Single-Stack Asm`)
-    that makes use of a single and contiguous stack is defined in
-    [`x86/SSAsm.v`](Multi-Stack-CompCert/x86/SSAsm.v). Note
-    that `Single-Stack Asm` still uses pseudo registers and
-    instructions like `Asm`. A forward simulation between `Asm`
-    semantics and `Single-Stack Asm` is proved in
-    [`x86/SSAsmproof.v`](Multi-Stack-CompCert/x86/SSAsmproof.v). This
-    proof makes critical use of abstract stack to merge the individual
-    stack frames into a single and contiguous stack.
-
-  + A third x86 Asm semantics (i.e., `RealAsm`) is defined
-    [`x86/RealAsm.v`](Multi-Stack-CompCert/x86/RealAsm.v). `RealAsm`
-    no longer relies on pseudo registers or instructions. A backward
-    simulation between `Single-Stack Asm` and `RealAsm` is proved in
-    [`x86/RealAsmproof.v`](Multi-Stack-CompCert/x86/RealAsmproof.v). This
-    proof is almost identical to the one in Stack-Aware CompCert.
-
 
 - (Lines 1099-1107) The proofs of Stack-Aware Nominal CompCert are
   updated straightforwardly by using the above definitions. The final
