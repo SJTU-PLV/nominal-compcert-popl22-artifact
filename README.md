@@ -555,7 +555,7 @@ correspond to the contents in Section 5.2.
     top-most stage. Since `stack_size` calculates the stack size by
     adding up the sizes of frames, the stack size consumption
     incurred by regular calls and tail calls to the same function is
-    the same. This matches with the description in Fig. 8 and is
+    the same. This matches with the description in Fig. 14 and is
     formalized in the following definition of the small-step
     transition:
   
