@@ -721,7 +721,7 @@ contents in Section 5.3 and 5.4.
     no longer relies on pseudo registers or instructions. A backward
     simulation between `Single-Stack Asm` and `RealAsm` is proved in
     [`x86/RealAsmproof.v`](Multi-Stack-CompCert/x86/RealAsmproof.v). This
-    proof is almost identical to the one in Stack-Aware CompCert.
+    proof is almost identical to the one in CompCertMC.
 
 - (Lines 1092-1095) The definition of supports (in
   [`common/Memory.v`](Multi-Stack-CompCert/common/Memory.v)) is
