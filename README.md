@@ -834,7 +834,7 @@ For the result at the row 'Total', run
 and add the numbers in 'spec' and 'proof' in the last line.
 
 #### Column 3
-For seperate files, run
+For separate files, run
 ```
     coqwc Nominal-CompCert-Struct-Memspace/common/Memory.v Nominal-CompCert-Struct-Memspace/common/Globalenvs.v Nominal-CompCert-Struct-Memspace/cfrontend/SimplLocalsproof.v Nominal-CompCert-Struct-Memspace/cfrontend/Cminorgenproof.v  Nominal-CompCert-Struct-Memspace/backend/Unusedglobproof.v Nominal-CompCert-Struct-Memspace/backend/Stackingproof.v
 ```
@@ -843,7 +843,7 @@ For 'Total' result, run
     coqwc Nominal-CompCert-Struct-Memspace/*/*.v
 ```
 #### Column 6
-For seperate files, run
+For separate files, run
 ```
     coqwc Stack-Aware-Nominal-CompCert/common/Memory.v Stack-Aware-Nominal-CompCert/common/Globalenvs.v Stack-Aware-Nominal-CompCert/cfrontend/SimplLocalsproof.v Stack-Aware-Nominal-CompCert/cfrontend/Cminorgenproof.v  Stack-Aware-Nominal-CompCert/backend/Unusedglobproof.v Stack-Aware-Nominal-CompCert/backend/Stackingproof.v
 ```
@@ -852,7 +852,7 @@ For 'Total' result, run
     coqwc Stack-Aware-Nominal-CompCert/*/*.v
 ```
 #### Column 9
-For seperate files, run
+For separate files, run
 ```
     coqwc Multi-Stack-CompCert/common/Memory.v Multi-Stack-CompCert/common/Globalenvs.v Multi-Stack-CompCert/cfrontend/SimplLocalsproof.v Multi-Stack-CompCert/cfrontend/Cminorgenproof.v  Multi-Stack-CompCert/backend/Unusedglobproof.v Multi-Stack-CompCert/backend/Stackingproof.v
 ```
